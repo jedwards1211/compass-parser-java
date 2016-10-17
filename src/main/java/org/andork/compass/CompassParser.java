@@ -33,7 +33,7 @@ public class CompassParser {
 	}
 
 	int getLine() {
-		return reader.getLineNumber();
+		return reader.getLineNumber() - 1;
 	}
 
 	String getSource() {
@@ -51,7 +51,7 @@ public class CompassParser {
 					Severity.ERROR,
 					fieldName + " must be >= 0 and < 360",
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.start(),
 					matcher.end() - 1));
 		}
@@ -64,7 +64,7 @@ public class CompassParser {
 					Severity.ERROR,
 					"missing " + fieldName,
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.regionEnd()));
 			return Double.NaN;
 		}
@@ -76,7 +76,7 @@ public class CompassParser {
 					Severity.ERROR,
 					"missing " + fieldName,
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.start(),
 					matcher.end() - 1));
 			return Double.NaN;
@@ -94,7 +94,7 @@ public class CompassParser {
 					Severity.ERROR,
 					fieldName + " must be >= " + min,
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.start(),
 					matcher.end() - 1));
 		}
@@ -108,7 +108,7 @@ public class CompassParser {
 					Severity.ERROR,
 					fieldName + " must be between " + min + " and " + max,
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.start(),
 					matcher.end() - 1));
 		}
@@ -143,7 +143,7 @@ public class CompassParser {
 							Severity.WARNING,
 							"missing # after flags",
 							source,
-							reader.getLineNumber(),
+							reader.getLineNumber() - 1,
 							matcher.end()));
 				}
 				for (int i = 2; i < flags.length() - 1; i++) {
@@ -170,7 +170,7 @@ public class CompassParser {
 								Severity.WARNING,
 								"unrecognized flag: " + flag,
 								source,
-								reader.getLineNumber(),
+								reader.getLineNumber() - 1,
 								matcher.start() + i));
 						break;
 					}
@@ -187,7 +187,7 @@ public class CompassParser {
 					CompassParseError.Severity.ERROR,
 					"missing " + fieldName,
 					source,
-					reader.getLineNumber(),
+					reader.getLineNumber() - 1,
 					matcher.start(),
 					matcher.end() - 1));
 			return null;
