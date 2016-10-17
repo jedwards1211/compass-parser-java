@@ -1,7 +1,5 @@
 package org.andork.compass;
 
-import java.io.File;
-
 public class CompassParseError {
 	public static enum Severity {
 		ERROR, WARNING
@@ -9,39 +7,40 @@ public class CompassParseError {
 
 	private Severity severity;
 	private String message;
-	private File file;
+	private String source;
 	private int startLine;
 	private int startColumn;
 	private int endLine;
 	private int endColumn;
 
-	public CompassParseError(Severity severity, String message, File file, int line, int column) {
+	public CompassParseError(Severity severity, String message, String source, int line, int column) {
 		super();
 		this.severity = severity;
 		this.message = message;
-		this.file = file;
+		this.source = source;
 		startLine = endLine = line;
 		startColumn = endColumn = column;
 	}
 
-	public CompassParseError(Severity severity, String message, File file, int line, int startColumn,
+	public CompassParseError(Severity severity, String message, String source, int line, int startColumn,
 			int endColumn) {
 		super();
 		this.severity = severity;
 		this.message = message;
-		this.file = file;
+		this.source = source;
 		startLine = line;
 		endLine = line;
 		this.startColumn = startColumn;
 		this.endColumn = endColumn;
 	}
 
-	public CompassParseError(Severity severity, String message, File file, int startLine, int startColumn, int endLine,
+	public CompassParseError(Severity severity, String message, String source, int startLine, int startColumn,
+			int endLine,
 			int endColumn) {
 		super();
 		this.severity = severity;
 		this.message = message;
-		this.file = file;
+		this.source = source;
 		this.startLine = startLine;
 		this.startColumn = startColumn;
 		this.endLine = endLine;
@@ -66,11 +65,11 @@ public class CompassParseError {
 		if (endLine != other.endLine) {
 			return false;
 		}
-		if (file == null) {
-			if (other.file != null) {
+		if (source == null) {
+			if (other.source != null) {
 				return false;
 			}
-		} else if (!file.equals(other.file)) {
+		} else if (!source.equals(other.source)) {
 			return false;
 		}
 		if (message == null) {
@@ -100,16 +99,16 @@ public class CompassParseError {
 		return endLine;
 	}
 
-	public File getFile() {
-		return file;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
 	public Severity getSeverity() {
 		return severity;
+	}
+
+	public String getSource() {
+		return source;
 	}
 
 	public int getStartColumn() {
@@ -126,11 +125,19 @@ public class CompassParseError {
 		int result = 1;
 		result = prime * result + endColumn;
 		result = prime * result + endLine;
-		result = prime * result + (file == null ? 0 : file.hashCode());
+		result = prime * result + (source == null ? 0 : source.hashCode());
 		result = prime * result + (message == null ? 0 : message.hashCode());
 		result = prime * result + (severity == null ? 0 : severity.hashCode());
 		result = prime * result + startColumn;
 		result = prime * result + startLine;
 		return result;
 	}
+
+	@Override
+	public String toString() {
+		return "CompassParseError [severity=" + severity + ", message=" + message + ", file=" + source + ", startLine="
+				+ startLine + ", startColumn=" + startColumn + ", endLine=" + endLine + ", endColumn=" + endColumn
+				+ "]";
+	}
+
 }

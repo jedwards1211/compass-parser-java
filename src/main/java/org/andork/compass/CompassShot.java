@@ -1,21 +1,77 @@
 package org.andork.compass;
 
 public class CompassShot {
+	/**
+	 * The name of the from station
+	 */
 	private String fromStationName;
+	/**
+	 * The name of the to station
+	 */
 	private String toStationName;
+	/**
+	 * Distance between the two stations, in feet
+	 */
 	private double length;
+	/**
+	 * Compass bearing toward to station at from station, in degrees
+	 */
 	private double frontsightAzimuth;
+	/**
+	 * Vertical angle toward to station at from station, in degrees
+	 */
 	private double frontsightInclination;
+	/**
+	 * Compass bearing toward from station at to station, in degrees
+	 */
 	private double backsightAzimuth;
+	/**
+	 * Vertical angle toward from station at to station, in degrees
+	 */
 	private double backsightInclination;
+	/**
+	 * Distance from station determined by corresponding
+	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
+	 * toward the next station), in feet.
+	 */
 	private double left;
+	/**
+	 * Distance from station determined by corresponding
+	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
+	 * toward the next station), in feet.
+	 */
 	private double right;
+	/**
+	 * Distance from station determined by corresponding
+	 * {@link CompassTripHeader#getLrudAssociation()} to the ceiling.
+	 */
 	private double up;
+	/**
+	 * Distance from station determined by corresponding
+	 * {@link CompassTripHeader#getLrudAssociation()} to the floor.
+	 */
 	private double down;
+	/**
+	 * Arbitrary user comment for this shot
+	 */
 	private String comment;
+	/**
+	 * Whether to exclude this shot's {@link #length} from the total length of
+	 * the cave.
+	 */
 	private boolean excludeFromLength;
+	/**
+	 * Whether to exclude this shot from plots.
+	 */
 	private boolean excludeFromPlotting;
+	/**
+	 * Whether to exclude this shot from all processing.
+	 */
 	private boolean excludeFromAllProcessing;
+	/**
+	 * If <code>true</code>, this shot should not be adjusted when closing
+	 * loops.
+	 */
 	private boolean doNotAdjust;
 
 	public double getBacksightAzimuth() {
