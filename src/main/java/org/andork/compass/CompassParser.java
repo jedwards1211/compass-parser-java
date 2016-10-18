@@ -35,6 +35,14 @@ public class CompassParser {
 
 	}
 
+	private void addError(String message, Segment segment) {
+		errors.add(new CompassParseError(Severity.ERROR, message, segment));
+	}
+
+	private void addWarning(String message, Segment segment) {
+		errors.add(new CompassParseError(Severity.WARNING, message, segment));
+	}
+
 	public List<CompassParseError> getErrors() {
 		return Collections.unmodifiableList(errors);
 	}
@@ -57,10 +65,7 @@ public class CompassParser {
 	private double parseAzimuth(SegmentMatcher matcher, String fieldName) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < 0 || measurement >= 360) {
-			errors.add(new CompassParseError(
-					Severity.ERROR,
-					fieldName + " must be >= 0 and < 360",
-					matcher.group()));
+			addError(fieldName + " must be >= 0 and < 360", matcher.group());
 		}
 		return measurement;
 	}
@@ -74,10 +79,7 @@ public class CompassParser {
 		case 'R':
 			return AzimuthUnit.GRADS;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized azimuth unit: " + unit.charAt(0),
-					unit));
+			addError("unrecognized azimuth unit: " + unit.charAt(0), unit);
 			return AzimuthUnit.DEGREES;
 		}
 	}
@@ -106,24 +108,15 @@ public class CompassParser {
 			return null;
 		}
 		if (month < 1 || month > 12) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"month must be between 1 and 12",
-					monthGroup));
+			addError("month must be between 1 and 12", monthGroup);
 			return null;
 		}
 		if (day < 1 || day > 31) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"day must be between 1 and 31",
-					dayGroup));
+			addError("day must be between 1 and 31", dayGroup);
 			return null;
 		}
 		if (year < 0) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"year must be >= 0",
-					yearGroup));
+			addError("year must be >= 0", yearGroup);
 		}
 
 		return new Date(year >= 100 ? year - 1900 : year, month - 1, day);
@@ -132,10 +125,7 @@ public class CompassParser {
 	private void parseFormat(CompassTripHeader header, Segment format) {
 		int i = 0;
 		if (format.length() < 11) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"format must be at least 11 characters long",
-					format.substring(format.length())));
+			addError("format must be at least 11 characters long", format.substring(format.length()));
 			return;
 		}
 		header.setAzimuthUnit(parseAzimuthUnit(format.charAtAsSegment(i++)));
@@ -168,29 +158,20 @@ public class CompassParser {
 		case 'W':
 			return InclinationUnit.DEPTH_GAUGE;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized inclination unit: " + unit.charAt(0),
-					unit));
+			addError("unrecognized inclination unit: " + unit.charAt(0), unit);
 			return InclinationUnit.DEGREES;
 		}
 	}
 
 	private Integer parseInt(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"missing " + fieldName,
-					matcher.group()));
+			addError("missing " + fieldName, matcher.group());
 			return null;
 		}
 		try {
 			return Integer.parseInt(matcher.group().toString());
 		} catch (NumberFormatException ex) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"invalid " + fieldName,
-					matcher.group()));
+			addError("invalid " + fieldName, matcher.group());
 			return null;
 		}
 	}
@@ -204,10 +185,7 @@ public class CompassParser {
 		case 'M':
 			return LengthUnit.METERS;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized distance unit: " + unit.charAt(0),
-					unit));
+			addError("unrecognized distance unit: " + unit.charAt(0), unit);
 			return LengthUnit.DECIMAL_FEET;
 		}
 	}
@@ -219,10 +197,7 @@ public class CompassParser {
 		case 'T':
 			return LrudAssociation.TO;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized station side: " + segment.charAt(0),
-					segment));
+			addError("unrecognized station side: " + segment.charAt(0), segment);
 			return null;
 		}
 	}
@@ -238,30 +213,21 @@ public class CompassParser {
 		case 'D':
 			return LrudMeasurement.DOWN;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized passage dimension measurement: " + segment.charAt(0),
-					segment));
+			addError("unrecognized passage dimension measurement: " + segment.charAt(0), segment);
 			return null;
 		}
 	}
 
 	private double parseMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
-			errors.add(new CompassParseError(
-					Severity.ERROR,
-					"missing " + fieldName,
-					matcher.group().substring(matcher.regionEnd())));
+			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
 			return Double.NaN;
 		}
 		double value;
 		try {
 			value = Double.parseDouble(matcher.group().toString());
 		} catch (NumberFormatException ex) {
-			errors.add(new CompassParseError(
-					Severity.ERROR,
-					"missing " + fieldName,
-					matcher.group()));
+			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
 		if (value < -900) {
@@ -273,10 +239,7 @@ public class CompassParser {
 	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min) {
-			errors.add(new CompassParseError(
-					Severity.ERROR,
-					fieldName + " must be >= " + min,
-					matcher.group()));
+			addError(fieldName + " must be >= " + min, matcher.group());
 		}
 		return measurement;
 	}
@@ -284,10 +247,7 @@ public class CompassParser {
 	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min, double max) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min || measurement > max) {
-			errors.add(new CompassParseError(
-					Severity.ERROR,
-					fieldName + " must be between " + min + " and " + max,
-					matcher.group()));
+			addError(fieldName + " must be between " + min + " and " + max, matcher.group());
 		}
 		return measurement;
 	}
@@ -296,10 +256,7 @@ public class CompassParser {
 			String measurementName) {
 		for (int i = 0; i < measurements.length; i++) {
 			if (segment.length() <= i) {
-				errors.add(new CompassParseError(
-						Severity.ERROR,
-						"missing " + measurementName,
-						segment.substring(segment.length())));
+				addError("missing " + measurementName, segment.substring(segment.length()));
 			}
 			measurements[i] = parser.apply(segment.charAtAsSegment(i));
 		}
@@ -332,10 +289,7 @@ public class CompassParser {
 				final Segment flags = matcher.group();
 				commentStart = matcher.end();
 				if (!flags.endsWith("#")) {
-					errors.add(new CompassParseError(
-							Severity.WARNING,
-							"missing # after flags",
-							flags.substring(flags.length())));
+					addError("missing # after flags", flags.substring(flags.length()));
 				}
 				for (int i = 2; i < flags.length() - 1; i++) {
 					final char flag = flags.charAt(i);
@@ -357,10 +311,7 @@ public class CompassParser {
 						shot.setDoNotAdjust(true);
 						break;
 					default:
-						errors.add(new CompassParseError(
-								Severity.WARNING,
-								"unrecognized flag: " + flag,
-								flags.charAtAsSegment(i)));
+						addWarning("unrecognized flag: " + flag, flags.charAtAsSegment(i));
 						break;
 					}
 				}
@@ -379,20 +330,14 @@ public class CompassParser {
 		case 'D':
 			return ShotMeasurement.INCLINATION;
 		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized shot measurement: " + segment.charAt(0),
-					segment));
+			addError("unrecognized shot measurement: " + segment.charAt(0), segment);
 			return null;
 		}
 	}
 
 	private String parseString(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"missing " + fieldName,
-					matcher.group()));
+			addError("missing " + fieldName, matcher.group());
 			return null;
 		}
 		return matcher.group().toString();
