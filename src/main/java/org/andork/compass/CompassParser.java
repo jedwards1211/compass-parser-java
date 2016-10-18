@@ -1,6 +1,7 @@
 package org.andork.compass;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -15,7 +16,7 @@ public class CompassParser {
 	}
 
 	public List<CompassParseError> getErrors() {
-		return errors;
+		return Collections.unmodifiableList(errors);
 	}
 
 	private double parseAzimuth(SegmentMatcher matcher, String fieldName) {
