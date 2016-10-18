@@ -231,7 +231,7 @@ public class CompassParser {
 			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
-		if (value < -900) {
+		if (value <= -900) {
 			return Double.NaN;
 		}
 		return value;
