@@ -16,6 +16,17 @@ public class CompassParser {
 	private static final Pattern HEADER_FIELDS = Pattern
 			.compile("SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:");
 
+	static Segment[] splitHeaderAndData(Segment segment) {
+		SegmentMatcher matcher = new SegmentMatcher(segment, EOL);
+		int i = 0;
+		int headerEnd = 0;
+		while (i < 8 && matcher.find()) {
+			i++;
+			headerEnd = matcher.end();
+		}
+		return new Segment[] { segment.substring(0, headerEnd).trim(), segment.substring(headerEnd).trim() };
+	}
+
 	private final List<CompassParseError> errors = new ArrayList<>();
 
 	public CompassParser() {
@@ -386,20 +397,14 @@ public class CompassParser {
 	}
 
 	public CompassTrip parseTrip(Segment segment) {
+		final Segment[] parts = splitHeaderAndData(segment);
 		CompassTrip trip = new CompassTrip();
-		SegmentMatcher matcher = new SegmentMatcher(segment, EOL);
-		int i = 0;
-		int headerEnd = 0;
-		while (i < 8 && matcher.find()) {
-			i++;
-			headerEnd = matcher.end();
-		}
-		CompassTripHeader header = parseTripHeader(segment.substring(0, headerEnd));
+		CompassTripHeader header = parseTripHeader(parts[0]);
 		trip.setHeader(header);
 
 		List<CompassShot> shots = new ArrayList<CompassShot>();
 
-		final Segment[] data = segment.substring(headerEnd).trim().split(EOL);
+		final Segment[] data = parts[1].split(EOL);
 		for (Segment line : data) {
 			CompassShot shot = parseShot(line, header);
 			if (shot != null) {

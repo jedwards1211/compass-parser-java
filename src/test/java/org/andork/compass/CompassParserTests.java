@@ -188,5 +188,27 @@ public class CompassParserTests {
 		});
 		assertFalse(header.isHasBacksights());
 		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@Test
+	public void testSplitHeaderAndData() {
+		Segment[] parts;
+		String text;
+
+		text = "SECRET CAVE\n" +
+				"SURVEY NAME: A\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLNF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0\n" +
+				"\n" +
+				"FROM TO  LENGTH BEARING  DIP    LEFT    UP  DOWN RIGHT\n" +
+				"\n" +
+				"A2  A1   12.00  135.00   5.00  0.00  4.00  0.50  0.00  Big Room\n" +
+				"A2  A3   41.17   46.00   2.00  0.00  0.00  0.00  0.00  #|PC# Room";
+		parts = CompassParser.splitHeaderAndData(new Segment(text, "test.txt", 0, 0));
+		assertEquals(text.substring(0, text.indexOf("A2")).trim(), parts[0].toString());
+		assertEquals(text.substring(text.indexOf("A2")).trim(), parts[1].toString());
 	}
 }
