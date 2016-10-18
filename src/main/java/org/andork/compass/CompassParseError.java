@@ -1,5 +1,7 @@
 package org.andork.compass;
 
+import org.andork.segment.Segment;
+
 public class CompassParseError {
 	public static enum Severity {
 		ERROR, WARNING

@@ -9,6 +9,8 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.andork.compass.CompassParseError.Severity;
+import org.andork.segment.Segment;
+import org.andork.segment.SegmentMatcher;
 
 public class CompassParser {
 	private static final Pattern EOL = Pattern.compile("\r|\n|\r\n");

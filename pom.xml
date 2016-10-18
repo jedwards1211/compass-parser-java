@@ -5,4 +5,11 @@
   <version>1.0.0</version>
   <name>Compass Parser</name>
   <description>compass cave survey data parser</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.andork</groupId>
+  		<artifactId>segment</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  </dependencies>
 </project>

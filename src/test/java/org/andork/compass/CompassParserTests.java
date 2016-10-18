@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.andork.compass.CompassParseError.Severity;
+import org.andork.segment.Segment;
 import org.junit.Test;
 
 public class CompassParserTests {
