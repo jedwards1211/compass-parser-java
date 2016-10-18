@@ -112,7 +112,7 @@ public class CompassParser {
 					yearGroup));
 		}
 
-		return new Date(year >= 100 ? year - 1900 : year, month + 1, day);
+		return new Date(year >= 100 ? year - 1900 : year, month - 1, day);
 	}
 
 	private void parseFormat(CompassTripHeader header, Segment format) {
@@ -132,11 +132,12 @@ public class CompassParser {
 		i += 4;
 		parseMeasurements(format.substring(i), header.getShotMeasurementOrder(), this::parseShotMeasurement,
 				"shot measurement");
+		i += 3;
 		if (format.length() > i) {
 			header.setHasBacksights(format.charAt(i++) == 'B');
 		}
 		if (format.length() > i) {
-			header.setLrudAssociation(parseStationSide(format.charAtAsSegment(i++)));
+			header.setLrudAssociation(parseLrudAssociation(format.charAtAsSegment(i++)));
 		}
 	}
 
@@ -194,6 +195,21 @@ public class CompassParser {
 					"unrecognized distance unit: " + unit.charAt(0),
 					unit));
 			return LengthUnit.DECIMAL_FEET;
+		}
+	}
+
+	private LrudAssociation parseLrudAssociation(Segment segment) {
+		switch (segment.charAt(0)) {
+		case 'F':
+			return LrudAssociation.FROM;
+		case 'T':
+			return LrudAssociation.TO;
+		default:
+			errors.add(new CompassParseError(
+					CompassParseError.Severity.ERROR,
+					"unrecognized station side: " + segment.charAt(0),
+					segment));
+			return null;
 		}
 	}
 
@@ -353,21 +369,6 @@ public class CompassParser {
 		}
 	}
 
-	private LrudAssociation parseStationSide(Segment segment) {
-		switch (segment.charAt(0)) {
-		case 'F':
-			return LrudAssociation.FROM;
-		case 'T':
-			return LrudAssociation.TO;
-		default:
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"unrecognized station side: " + segment.charAt(0),
-					segment));
-			return null;
-		}
-	}
-
 	private String parseString(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			errors.add(new CompassParseError(
@@ -384,26 +385,26 @@ public class CompassParser {
 		final Segment[] parts = segment.trim().split("\r|\n|\r\n", 2);
 		header.setCaveName(parts[0].toString());
 		getFields(new SegmentMatcher(parts[1], HEADER_FIELDS), (field, value) -> {
-			if (field == "SURVEY NAME:") {
+			if (field.equals("SURVEY NAME:")) {
 				header.setSurveyName(parseString(new SegmentMatcher(value, NON_WHITESPACE), "survey name"));
-			} else if (field == "SURVEY DATE:") {
+			} else if (field.equals("SURVEY DATE:")) {
 				header.setDate(parseDate(value));
-			} else if (field == "COMMENT:") {
+			} else if (field.equals("COMMENT:")) {
 				header.setComment(value.toString());
-			} else if (field == "SURVEY TEAM:") {
+			} else if (field.equals("SURVEY TEAM:")) {
 				header.setTeam(value.toString());
-			} else if (field == "DECLINATION:") {
+			} else if (field.equals("DECLINATION:")) {
 				header.setDeclination(
 						parseMeasurement(new SegmentMatcher(value, NON_WHITESPACE), "declination"));
-			} else if (field == "FORMAT:") {
+			} else if (field.equals("FORMAT:")) {
 				parseFormat(header, value);
-			} else if (field == "CORRECTIONS:") {
+			} else if (field.equals("CORRECTIONS:")) {
 				SegmentMatcher matcher = new SegmentMatcher(value, NON_WHITESPACE);
 				header.setLengthCorrection(parseMeasurement(matcher, "length correction"));
 				header.setFrontsightAzimuthCorrection(parseMeasurement(matcher, "frontsight azimuth correction"));
 				header.setFrontsightInclinationCorrection(
 						parseMeasurement(matcher, "frontsight inclination correction"));
-			} else if (field == "CORRECTIONS2:") {
+			} else if (field.equals("CORRECTIONS2:")) {
 				SegmentMatcher matcher = new SegmentMatcher(value, NON_WHITESPACE);
 				header.setBacksightAzimuthCorrection(parseMeasurement(matcher, "backsight azimuth correction"));
 				header.setBacksightInclinationCorrection(parseMeasurement(matcher, "backsight inclination correction"));

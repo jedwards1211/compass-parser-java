@@ -1,8 +1,11 @@
 package org.andork.compass;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
 
 import org.andork.compass.CompassParseError.Severity;
 import org.junit.Test;
@@ -151,5 +154,39 @@ public class CompassParserTests {
 		assertFalse(shot.isExcludeFromAllProcessing());
 		assertEquals(shot.getComment(), "");
 		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@Test
+	public void testParseCorrectTripHeader() {
+		final CompassParser parser = new CompassParser();
+		final CompassTripHeader header = parser.parseTripHeader(new Segment("SECRET CAVE\n" +
+				"SURVEY NAME: A\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLNF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0",
+				"test.txt", 0, 0));
+		assertEquals(header.getCaveName(), "SECRET CAVE");
+		assertEquals(header.getSurveyName(), "A");
+		assertEquals(header.getDate(), new Date(79, 6, 10));
+		assertEquals(header.getTeam(), "D.SMITH,R.BROWN,S.MURRAY");
+		assertEquals(header.getDeclination(), 1.0, 0.0);
+		assertEquals(header.getAzimuthUnit(), AzimuthUnit.DEGREES);
+		assertEquals(header.getLengthUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getLrudUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getInclinationUnit(), InclinationUnit.DEGREES);
+		assertArrayEquals(header.getLrudOrder(), new LrudMeasurement[] {
+				LrudMeasurement.LEFT,
+				LrudMeasurement.UP,
+				LrudMeasurement.DOWN,
+				LrudMeasurement.RIGHT,
+		});
+		assertArrayEquals(header.getShotMeasurementOrder(), new ShotMeasurement[] {
+				ShotMeasurement.AZIMUTH,
+				ShotMeasurement.INCLINATION,
+				ShotMeasurement.LENGTH,
+		});
+		assertFalse(header.isHasBacksights());
+		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
 	}
 }
