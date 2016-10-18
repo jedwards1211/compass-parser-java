@@ -15,8 +15,9 @@ import org.andork.segment.SegmentMatcher;
 public class CompassParser {
 	private static final Pattern EOL = Pattern.compile("\r\n|\r|\n");
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
-	private static final Pattern HEADER_FIELDS = Pattern
-			.compile("SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:");
+	private static final Pattern HEADER_FIELDS = Pattern.compile(
+			"SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:",
+			Pattern.CASE_INSENSITIVE);
 
 	static Segment[] splitHeaderAndData(Segment segment) {
 		SegmentMatcher matcher = new SegmentMatcher(segment, EOL);
@@ -71,7 +72,7 @@ public class CompassParser {
 	}
 
 	private AzimuthUnit parseAzimuthUnit(Segment unit) {
-		switch (unit.charAt(0)) {
+		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return AzimuthUnit.DEGREES;
 		case 'Q':
@@ -146,7 +147,7 @@ public class CompassParser {
 	}
 
 	private InclinationUnit parseInclinationUnit(Segment unit) {
-		switch (unit.charAt(0)) {
+		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return InclinationUnit.DEGREES;
 		case 'G':
@@ -177,7 +178,7 @@ public class CompassParser {
 	}
 
 	private LengthUnit parseLengthUnit(Segment unit) {
-		switch (unit.charAt(0)) {
+		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return LengthUnit.DECIMAL_FEET;
 		case 'I':
@@ -191,7 +192,7 @@ public class CompassParser {
 	}
 
 	private LrudAssociation parseLrudAssociation(Segment segment) {
-		switch (segment.charAt(0)) {
+		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'F':
 			return LrudAssociation.FROM;
 		case 'T':
@@ -203,7 +204,7 @@ public class CompassParser {
 	}
 
 	private LrudMeasurement parseLrudMeasurement(Segment segment) {
-		switch (segment.charAt(0)) {
+		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
 			return LrudMeasurement.LEFT;
 		case 'R':
@@ -293,20 +294,16 @@ public class CompassParser {
 				}
 				for (int i = 2; i < flags.length() - 1; i++) {
 					final char flag = flags.charAt(i);
-					switch (flag) {
-					case 'l':
+					switch (Character.toUpperCase(flag)) {
 					case 'L':
 						shot.setExcludeFromLength(true);
 						break;
-					case 'p':
 					case 'P':
 						shot.setExcludeFromPlotting(true);
 						break;
-					case 'x':
 					case 'X':
 						shot.setExcludeFromAllProcessing(true);
 						break;
-					case 'c':
 					case 'C':
 						shot.setDoNotAdjust(true);
 						break;
@@ -322,7 +319,7 @@ public class CompassParser {
 	}
 
 	private ShotMeasurement parseShotMeasurement(Segment segment) {
-		switch (segment.charAt(0)) {
+		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
 			return ShotMeasurement.LENGTH;
 		case 'A':
@@ -367,26 +364,26 @@ public class CompassParser {
 		final Segment[] parts = segment.trim().split(EOL, 2);
 		header.setCaveName(parts[0].toString());
 		getFields(new SegmentMatcher(parts[1], HEADER_FIELDS), (field, value) -> {
-			if (field.equals("SURVEY NAME:")) {
+			if (field.equalsIgnoreCase("SURVEY NAME:")) {
 				header.setSurveyName(parseString(new SegmentMatcher(value, NON_WHITESPACE), "survey name"));
-			} else if (field.equals("SURVEY DATE:")) {
+			} else if (field.equalsIgnoreCase("SURVEY DATE:")) {
 				header.setDate(parseDate(value));
-			} else if (field.equals("COMMENT:")) {
+			} else if (field.equalsIgnoreCase("COMMENT:")) {
 				header.setComment(value.toString());
-			} else if (field.equals("SURVEY TEAM:")) {
+			} else if (field.equalsIgnoreCase("SURVEY TEAM:")) {
 				header.setTeam(value.toString());
-			} else if (field.equals("DECLINATION:")) {
+			} else if (field.equalsIgnoreCase("DECLINATION:")) {
 				header.setDeclination(
 						parseMeasurement(new SegmentMatcher(value, NON_WHITESPACE), "declination"));
-			} else if (field.equals("FORMAT:")) {
+			} else if (field.equalsIgnoreCase("FORMAT:")) {
 				parseFormat(header, value);
-			} else if (field.equals("CORRECTIONS:")) {
+			} else if (field.equalsIgnoreCase("CORRECTIONS:")) {
 				SegmentMatcher matcher = new SegmentMatcher(value, NON_WHITESPACE);
 				header.setLengthCorrection(parseMeasurement(matcher, "length correction"));
 				header.setFrontsightAzimuthCorrection(parseMeasurement(matcher, "frontsight azimuth correction"));
 				header.setFrontsightInclinationCorrection(
 						parseMeasurement(matcher, "frontsight inclination correction"));
-			} else if (field.equals("CORRECTIONS2:")) {
+			} else if (field.equalsIgnoreCase("CORRECTIONS2:")) {
 				SegmentMatcher matcher = new SegmentMatcher(value, NON_WHITESPACE);
 				header.setBacksightAzimuthCorrection(parseMeasurement(matcher, "backsight azimuth correction"));
 				header.setBacksightInclinationCorrection(parseMeasurement(matcher, "backsight inclination correction"));
