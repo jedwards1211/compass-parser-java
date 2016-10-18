@@ -180,20 +180,20 @@ public class CompassParser {
 		}
 	}
 
-	private DistanceUnit parseLengthUnit(Segment unit) {
+	private LengthUnit parseLengthUnit(Segment unit) {
 		switch (unit.charAt(0)) {
 		case 'D':
-			return DistanceUnit.DECIMAL_FEET;
+			return LengthUnit.DECIMAL_FEET;
 		case 'I':
-			return DistanceUnit.FEET_AND_INCHES;
+			return LengthUnit.FEET_AND_INCHES;
 		case 'M':
-			return DistanceUnit.METERS;
+			return LengthUnit.METERS;
 		default:
 			errors.add(new CompassParseError(
 					CompassParseError.Severity.ERROR,
 					"unrecognized distance unit: " + unit.charAt(0),
 					unit));
-			return DistanceUnit.DECIMAL_FEET;
+			return LengthUnit.DECIMAL_FEET;
 		}
 	}
 
@@ -353,12 +353,12 @@ public class CompassParser {
 		}
 	}
 
-	private StationSide parseStationSide(Segment segment) {
+	private LrudAssociation parseStationSide(Segment segment) {
 		switch (segment.charAt(0)) {
 		case 'F':
-			return StationSide.FROM;
+			return LrudAssociation.FROM;
 		case 'T':
-			return StationSide.TO;
+			return LrudAssociation.TO;
 		default:
 			errors.add(new CompassParseError(
 					CompassParseError.Severity.ERROR,

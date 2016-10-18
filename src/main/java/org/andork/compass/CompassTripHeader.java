@@ -35,11 +35,11 @@ public class CompassTripHeader {
 	/**
 	 * Display for shot lengths
 	 */
-	private DistanceUnit lengthUnit;
+	private LengthUnit lengthUnit;
 	/**
 	 * Display unit for shot LRUDs
 	 */
-	private DistanceUnit lrudUnit;
+	private LengthUnit lrudUnit;
 	/**
 	 * Display unit for shot azimuths
 	 */
@@ -67,7 +67,7 @@ public class CompassTripHeader {
 	 * Whether LRUDs in this trip are associated with the from or to station of
 	 * shots.
 	 */
-	private StationSide lrudAssociation;
+	private LrudAssociation lrudAssociation;
 	/**
 	 * Correction added to the length of each shot in this trip, in feet.
 	 */
@@ -137,11 +137,11 @@ public class CompassTripHeader {
 		return lengthCorrection;
 	}
 
-	public DistanceUnit getLengthUnit() {
+	public LengthUnit getLengthUnit() {
 		return lengthUnit;
 	}
 
-	public StationSide getLrudAssociation() {
+	public LrudAssociation getLrudAssociation() {
 		return lrudAssociation;
 	}
 
@@ -149,7 +149,7 @@ public class CompassTripHeader {
 		return lrudOrder;
 	}
 
-	public DistanceUnit getLrudUnit() {
+	public LengthUnit getLrudUnit() {
 		return lrudUnit;
 	}
 
@@ -217,15 +217,15 @@ public class CompassTripHeader {
 		this.lengthCorrection = lengthCorrection;
 	}
 
-	public void setLengthUnit(DistanceUnit lengthUnit) {
+	public void setLengthUnit(LengthUnit lengthUnit) {
 		this.lengthUnit = lengthUnit;
 	}
 
-	public void setLrudAssociation(StationSide lrudAssociation) {
+	public void setLrudAssociation(LrudAssociation lrudAssociation) {
 		this.lrudAssociation = lrudAssociation;
 	}
 
-	public void setLrudUnit(DistanceUnit lrudUnit) {
+	public void setLrudUnit(LengthUnit lrudUnit) {
 		this.lrudUnit = lrudUnit;
 	}
 
