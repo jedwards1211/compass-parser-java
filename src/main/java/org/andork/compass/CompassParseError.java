@@ -7,9 +7,9 @@ public class CompassParseError {
 		ERROR, WARNING
 	}
 
-	private Severity severity;
-	private String message;
-	private Segment segment;
+	private final Severity severity;
+	private final String message;
+	private final Segment segment;
 
 	public CompassParseError(Severity severity, String message, Segment segment) {
 		super();
@@ -70,18 +70,6 @@ public class CompassParseError {
 		result = prime * result + (segment == null ? 0 : segment.hashCode());
 		result = prime * result + (severity == null ? 0 : severity.hashCode());
 		return result;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public void setSegment(Segment segment) {
-		this.segment = segment;
-	}
-
-	public void setSeverity(Severity severity) {
-		this.severity = severity;
 	}
 
 	@Override
