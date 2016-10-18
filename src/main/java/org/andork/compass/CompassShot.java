@@ -122,19 +122,19 @@ public class CompassShot {
 		return up;
 	}
 
-	public boolean isDoNotAdjust() {
+	public boolean doNotAdjust() {
 		return doNotAdjust;
 	}
 
-	public boolean isExcludeFromAllProcessing() {
+	public boolean excludeFromAllProcessing() {
 		return excludeFromAllProcessing;
 	}
 
-	public boolean isExcludeFromLength() {
+	public boolean excludeFromLength() {
 		return excludeFromLength;
 	}
 
-	public boolean isExcludeFromPlotting() {
+	public boolean excludeFromPlotting() {
 		return excludeFromPlotting;
 	}
 

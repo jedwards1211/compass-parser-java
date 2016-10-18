@@ -322,7 +322,7 @@ public class CompassParser {
 		shot.setUp(parseMeasurement(matcher, "up", 0));
 		shot.setDown(parseMeasurement(matcher, "down", 0));
 		shot.setRight(parseMeasurement(matcher, "right", 0));
-		if (tripHeader.isHasBacksights()) {
+		if (tripHeader.hasBacksights()) {
 			shot.setBacksightAzimuth(parseAzimuth(matcher, "backsight azimuth"));
 			shot.setBacksightInclination(parseMeasurement(matcher, "backsight inclination", -90, 90));
 		}

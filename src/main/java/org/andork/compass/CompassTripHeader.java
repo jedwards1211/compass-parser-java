@@ -165,7 +165,7 @@ public class CompassTripHeader {
 		return team;
 	}
 
-	public boolean isHasBacksights() {
+	public boolean hasBacksights() {
 		return hasBacksights;
 	}
 
