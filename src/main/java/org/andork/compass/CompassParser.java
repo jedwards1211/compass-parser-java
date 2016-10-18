@@ -1,84 +1,50 @@
 package org.andork.compass;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.andork.compass.CompassParseError.Severity;
 
 public class CompassParser {
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
-	private String source;
-	private LineNumberReader reader;
 	private final List<CompassParseError> errors = new ArrayList<>();
 
-	private CompassTripHeader tripHeader;
+	public CompassParser() {
 
-	CompassParser(String source, String text) {
-		this.source = source;
-		reader = new LineNumberReader(new StringReader(text));
-	}
-
-	CompassParser(String source, String text, CompassTripHeader header) {
-		this(source, text);
-		tripHeader = header;
 	}
 
 	public List<CompassParseError> getErrors() {
 		return errors;
 	}
 
-	int getLine() {
-		return reader.getLineNumber() - 1;
-	}
-
-	String getSource() {
-		return source;
-	}
-
-	CompassTripHeader getTripHeader() {
-		return tripHeader;
-	}
-
-	private double parseAzimuth(Matcher matcher, String fieldName) {
+	private double parseAzimuth(SegmentMatcher matcher, String fieldName) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < 0 || measurement >= 360) {
 			errors.add(new CompassParseError(
 					Severity.ERROR,
 					fieldName + " must be >= 0 and < 360",
-					source,
-					reader.getLineNumber() - 1,
-					matcher.start(),
-					matcher.end() - 1));
+					matcher.group()));
 		}
 		return measurement;
 	}
 
-	private double parseMeasurement(Matcher matcher, String fieldName) {
+	private double parseMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			errors.add(new CompassParseError(
 					Severity.ERROR,
 					"missing " + fieldName,
-					source,
-					reader.getLineNumber() - 1,
-					matcher.regionEnd()));
+					matcher.group().substring(matcher.regionEnd())));
 			return Double.NaN;
 		}
 		double value;
 		try {
-			value = Double.parseDouble(matcher.group());
+			value = Double.parseDouble(matcher.group().toString());
 		} catch (NumberFormatException ex) {
 			errors.add(new CompassParseError(
 					Severity.ERROR,
 					"missing " + fieldName,
-					source,
-					reader.getLineNumber() - 1,
-					matcher.start(),
-					matcher.end() - 1));
+					matcher.group()));
 			return Double.NaN;
 		}
 		if (value < -900) {
@@ -87,37 +53,30 @@ public class CompassParser {
 		return value;
 	}
 
-	private double parseMeasurement(Matcher matcher, String fieldName, double min) {
+	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min) {
 			errors.add(new CompassParseError(
 					Severity.ERROR,
 					fieldName + " must be >= " + min,
-					source,
-					reader.getLineNumber() - 1,
-					matcher.start(),
-					matcher.end() - 1));
+					matcher.group()));
 		}
 		return measurement;
 	}
 
-	private double parseMeasurement(Matcher matcher, String fieldName, double min, double max) {
+	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min, double max) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min || measurement > max) {
 			errors.add(new CompassParseError(
 					Severity.ERROR,
 					fieldName + " must be between " + min + " and " + max,
-					source,
-					reader.getLineNumber() - 1,
-					matcher.start(),
-					matcher.end() - 1));
+					matcher.group()));
 		}
 		return measurement;
 	}
 
-	CompassShot parseShot() throws IOException {
-		String text = reader.readLine();
-		final Matcher matcher = NON_WHITESPACE.matcher(text);
+	public CompassShot parseShot(Segment segment, CompassTripHeader tripHeader) {
+		final SegmentMatcher matcher = new SegmentMatcher(segment, NON_WHITESPACE);
 
 		final CompassShot shot = new CompassShot();
 		shot.setFromStationName(parseString(matcher, "from station name"));
@@ -136,15 +95,13 @@ public class CompassParser {
 		int commentStart = matcher.end();
 		if (matcher.find()) {
 			if (matcher.group().startsWith("#|")) {
-				final String flags = matcher.group();
+				final Segment flags = matcher.group();
 				commentStart = matcher.end();
 				if (!flags.endsWith("#")) {
 					errors.add(new CompassParseError(
 							Severity.WARNING,
 							"missing # after flags",
-							source,
-							reader.getLineNumber() - 1,
-							matcher.end()));
+							flags.substring(flags.length())));
 				}
 				for (int i = 2; i < flags.length() - 1; i++) {
 					final char flag = flags.charAt(i);
@@ -169,38 +126,24 @@ public class CompassParser {
 						errors.add(new CompassParseError(
 								Severity.WARNING,
 								"unrecognized flag: " + flag,
-								source,
-								reader.getLineNumber() - 1,
-								matcher.start() + i));
+								flags.charAtAsSegment(i)));
 						break;
 					}
 				}
 			}
 		}
-		shot.setComment(text.substring(commentStart).trim());
+		shot.setComment(segment.substring(commentStart).toString().trim());
 		return shot;
 	}
 
-	private String parseString(Matcher matcher, String fieldName) {
+	private String parseString(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			errors.add(new CompassParseError(
 					CompassParseError.Severity.ERROR,
 					"missing " + fieldName,
-					source,
-					reader.getLineNumber() - 1,
-					matcher.start(),
-					matcher.end() - 1));
+					matcher.group()));
 			return null;
 		}
-		return matcher.group();
+		return matcher.group().toString();
 	}
-
-	void setSource(String source) {
-		this.source = source;
-	}
-
-	void setTripHeader(CompassTripHeader tripHeader) {
-		this.tripHeader = tripHeader;
-	}
-
 }

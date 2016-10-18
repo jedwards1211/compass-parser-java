@@ -5,6 +5,7 @@ public class CompassParseError {
 		ERROR, WARNING
 	}
 
+	private Segment segment;
 	private Severity severity;
 	private String message;
 	private String source;
@@ -12,6 +13,18 @@ public class CompassParseError {
 	private int startColumn;
 	private int endLine;
 	private int endColumn;
+
+	public CompassParseError(Severity severity, String message, Segment segment) {
+		super();
+		this.severity = severity;
+		this.message = message;
+		this.segment = segment;
+		source = segment.source.toString();
+		startLine = segment.startLine;
+		startColumn = segment.startCol;
+		endLine = segment.endLine;
+		endColumn = segment.endCol;
+	}
 
 	public CompassParseError(Severity severity, String message, String source, int line, int column) {
 		super();
