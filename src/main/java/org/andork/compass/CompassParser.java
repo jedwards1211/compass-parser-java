@@ -48,7 +48,7 @@ public class CompassParser {
 		return Collections.unmodifiableList(errors);
 	}
 
-	private void getFields(SegmentMatcher matcher, BiConsumer<String, Segment> iteratee) {
+	void getFields(SegmentMatcher matcher, BiConsumer<String, Segment> iteratee) {
 		if (!matcher.find()) {
 			return;
 		}
@@ -63,7 +63,7 @@ public class CompassParser {
 		iteratee.accept(lastMatch, matcher.segment().substring(lastEnd));
 	}
 
-	private double parseAzimuth(SegmentMatcher matcher, String fieldName) {
+	double parseAzimuth(SegmentMatcher matcher, String fieldName) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < 0 || measurement >= 360) {
 			addError(fieldName + " must be >= 0 and < 360", matcher.group());
@@ -71,7 +71,7 @@ public class CompassParser {
 		return measurement;
 	}
 
-	private AzimuthUnit parseAzimuthUnit(Segment unit) {
+	AzimuthUnit parseAzimuthUnit(Segment unit) {
 		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return AzimuthUnit.DEGREES;
@@ -97,7 +97,7 @@ public class CompassParser {
 	}
 
 	@SuppressWarnings("deprecation")
-	private Date parseDate(Segment segment) {
+	Date parseDate(Segment segment) {
 		SegmentMatcher dateMatcher = new SegmentMatcher(segment, NON_WHITESPACE);
 		Integer month = parseInt(dateMatcher, "month");
 		Segment monthGroup = month != null ? dateMatcher.group() : null;
@@ -123,7 +123,7 @@ public class CompassParser {
 		return new Date(year >= 100 ? year - 1900 : year, month - 1, day);
 	}
 
-	private InclinationUnit parseInclinationUnit(Segment unit) {
+	InclinationUnit parseInclinationUnit(Segment unit) {
 		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return InclinationUnit.DEGREES;
@@ -141,7 +141,7 @@ public class CompassParser {
 		}
 	}
 
-	private Integer parseInt(SegmentMatcher matcher, String fieldName) {
+	Integer parseInt(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.group());
 			return null;
@@ -154,7 +154,7 @@ public class CompassParser {
 		}
 	}
 
-	private LengthUnit parseLengthUnit(Segment unit) {
+	LengthUnit parseLengthUnit(Segment unit) {
 		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
 			return LengthUnit.DECIMAL_FEET;
@@ -168,7 +168,7 @@ public class CompassParser {
 		}
 	}
 
-	private LrudAssociation parseLrudAssociation(Segment segment) {
+	LrudAssociation parseLrudAssociation(Segment segment) {
 		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'F':
 			return LrudAssociation.FROM;
@@ -180,7 +180,7 @@ public class CompassParser {
 		}
 	}
 
-	private LrudItem parseLrudItem(Segment segment) {
+	LrudItem parseLrudItem(Segment segment) {
 		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
 			return LrudItem.LEFT;
@@ -196,7 +196,7 @@ public class CompassParser {
 		}
 	}
 
-	private double parseLrudMeasurement(SegmentMatcher matcher, String fieldName) {
+	double parseLrudMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
 			return Double.NaN;
@@ -217,7 +217,7 @@ public class CompassParser {
 		return value;
 	}
 
-	private double parseMeasurement(SegmentMatcher matcher, String fieldName) {
+	double parseMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
 			return Double.NaN;
@@ -235,7 +235,7 @@ public class CompassParser {
 		return value;
 	}
 
-	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min) {
+	double parseMeasurement(SegmentMatcher matcher, String fieldName, double min) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min) {
 			addError(fieldName + " must be >= " + min, matcher.group());
@@ -243,7 +243,7 @@ public class CompassParser {
 		return measurement;
 	}
 
-	private double parseMeasurement(SegmentMatcher matcher, String fieldName, double min, double max) {
+	double parseMeasurement(SegmentMatcher matcher, String fieldName, double min, double max) {
 		double measurement = parseMeasurement(matcher, fieldName);
 		if (measurement < min || measurement > max) {
 			addError(fieldName + " must be between " + min + " and " + max, matcher.group());
@@ -251,7 +251,7 @@ public class CompassParser {
 		return measurement;
 	}
 
-	private <T> void parseOrder(Segment segment, T[] order, Function<Segment, T> parser,
+	<T> void parseOrder(Segment segment, T[] order, Function<Segment, T> parser,
 			String itemName) {
 		for (int i = 0; i < order.length; i++) {
 			if (segment.length() <= i) {
@@ -316,7 +316,7 @@ public class CompassParser {
 		return shot;
 	}
 
-	private void parseShotFormat(CompassTripHeader header, Segment format) {
+	void parseShotFormat(CompassTripHeader header, Segment format) {
 		int i = 0;
 		if (format.length() < 11) {
 			addError("format must be at least 11 characters long", format.substring(format.length()));
@@ -339,7 +339,7 @@ public class CompassParser {
 		}
 	}
 
-	private ShotItem parseShotItem(Segment segment) {
+	ShotItem parseShotItem(Segment segment) {
 		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
 			return ShotItem.LENGTH;
@@ -353,7 +353,7 @@ public class CompassParser {
 		}
 	}
 
-	private String parseString(SegmentMatcher matcher, String fieldName) {
+	String parseString(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.group());
 			return null;
