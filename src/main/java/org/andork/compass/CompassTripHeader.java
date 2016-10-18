@@ -55,7 +55,7 @@ public class CompassTripHeader {
 			LrudMeasurement.DOWN,
 	};
 	private final ShotMeasurement[] shotMeasurementOrder = {
-			ShotMeasurement.DISTANCE,
+			ShotMeasurement.LENGTH,
 			ShotMeasurement.AZIMUTH,
 			ShotMeasurement.INCLINATION,
 	};
