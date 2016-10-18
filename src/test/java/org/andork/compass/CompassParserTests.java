@@ -158,6 +158,7 @@ public class CompassParserTests {
 		assertEquals(parser.getErrors().size(), 0);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testParseCompassSurveyData() {
 		String text = "SECRET CAVE\n" +
@@ -232,6 +233,7 @@ public class CompassParserTests {
 		assertEquals(parser.getErrors().size(), 0);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testParseCorrectTripHeader() {
 		final CompassParser parser = new CompassParser();
