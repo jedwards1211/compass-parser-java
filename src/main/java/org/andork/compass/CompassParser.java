@@ -13,7 +13,7 @@ import org.andork.segment.Segment;
 import org.andork.segment.SegmentMatcher;
 
 public class CompassParser {
-	private static final Pattern EOL = Pattern.compile("\r|\n|\r\n");
+	private static final Pattern EOL = Pattern.compile("\r\n|\r|\n");
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
 	private static final Pattern HEADER_FIELDS = Pattern
 			.compile("SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:");
@@ -419,7 +419,7 @@ public class CompassParser {
 
 	public CompassTripHeader parseTripHeader(Segment segment) {
 		final CompassTripHeader header = new CompassTripHeader();
-		final Segment[] parts = segment.trim().split("\r|\n|\r\n", 2);
+		final Segment[] parts = segment.trim().split(EOL, 2);
 		header.setCaveName(parts[0].toString());
 		getFields(new SegmentMatcher(parts[1], HEADER_FIELDS), (field, value) -> {
 			if (field.equals("SURVEY NAME:")) {
