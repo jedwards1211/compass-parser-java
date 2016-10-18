@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.List;
 
 import org.andork.compass.CompassParseError.Severity;
 import org.junit.Test;
@@ -153,6 +154,80 @@ public class CompassParserTests {
 		assertFalse(shot.isExcludeFromPlotting());
 		assertFalse(shot.isExcludeFromAllProcessing());
 		assertEquals(shot.getComment(), "");
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@Test
+	public void testParseCompassSurveyData() {
+		String text = "SECRET CAVE\n" +
+				"SURVEY NAME: A\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLNF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0\n" +
+				"\n" +
+				"FROM TO  LENGTH BEARING  DIP    LEFT    UP  DOWN RIGHT\n" +
+				"\n" +
+				"A2  A1   12.00  135.00   5.00  0.00  4.00  0.50  0.00  Big Room\n" +
+				"A2  A3   41.17   46.00   2.00  0.00  0.00  0.00  0.00  #|PC# Room\n" +
+				"A3  A4    4.25   15.00 -85.00  5.00  3.50  0.75  0.50\n" +
+				"A4  A5   22.50  129.00 -21.00  0.00  0.00  0.00  0.00  #|PX#\n" +
+				"\f\n" +
+				"SECRET CAVE\n" +
+				"SURVEY NAME: B\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Big Room Survey\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLNT  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0 \n" +
+				"\n" +
+				"FROM TO   LEN  BEAR   INC LEFT   UP DOWN RIGHT AZM2 INC2 FLAGS COMMENTS\n" +
+				"\n" +
+				"B2  B1  13.0  35.0  15.0  0.0  2.0  1.5  1.0 215.0 -15.0      Side Passage\n" +
+				"B2  B3  22.1  16.0  22.0  6.0  1.0  0.0  2.0 196.0 -22.0 #|PC#\n" +
+				"B3  B4   3.2  11.0 -82.0  2.0  2.5  2.7  3.5 191.0  82.0\n" +
+				"B4  B5  23.5 111.0  11.0  0.0  0.0  1.0  1.0 291.0 -11.0 #|PX#\n" +
+				"\f";
+
+		final CompassParser parser = new CompassParser();
+		List<CompassTrip> trips = parser.parseCompassSurveyData(new Segment(text, "test.txt", 0, 0));
+		assertEquals(trips.size(), 2);
+
+		CompassShot shot;
+
+		CompassTrip trip2 = trips.get(1);
+		assertEquals("SECRET CAVE", trip2.getHeader().getCaveName());
+		assertEquals(new Date(79, 6, 10), trip2.getHeader().getDate());
+		assertEquals("D.SMITH,R.BROWN,S.MURRAY", trip2.getHeader().getTeam());
+		assertEquals(1.0, trip2.getHeader().getDeclination(), 0.0);
+		assertEquals(trip2.getHeader().getAzimuthUnit(), AzimuthUnit.DEGREES);
+		assertEquals(trip2.getHeader().getLengthUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(trip2.getHeader().getLrudUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(trip2.getHeader().getInclinationUnit(), InclinationUnit.DEGREES);
+		assertArrayEquals(trip2.getHeader().getLrudOrder(), new LrudMeasurement[] {
+				LrudMeasurement.LEFT,
+				LrudMeasurement.UP,
+				LrudMeasurement.DOWN,
+				LrudMeasurement.RIGHT,
+		});
+		assertArrayEquals(trip2.getHeader().getShotMeasurementOrder(), new ShotMeasurement[] {
+				ShotMeasurement.AZIMUTH,
+				ShotMeasurement.INCLINATION,
+				ShotMeasurement.LENGTH,
+		});
+		assertFalse(trip2.getHeader().isHasBacksights());
+		assertEquals(LrudAssociation.TO, trip2.getHeader().getLrudAssociation());
+
+		shot = trip2.getShots().get(0);
+		assertEquals("B2", shot.getFromStationName());
+		assertEquals("B1", shot.getToStationName());
+		assertEquals(13.0, shot.getLength(), 0.0);
+		assertEquals(35.0, shot.getFrontsightAzimuth(), 0.0);
+		assertEquals(15.0, shot.getFrontsightInclination(), 0.0);
+		assertEquals(0.0, shot.getLeft(), 0.0);
+		assertEquals(2.0, shot.getUp(), 0.0);
+		assertEquals(1.5, shot.getDown(), 0.0);
+		assertEquals(1.0, shot.getRight(), 0.0);
+
 		assertEquals(parser.getErrors().size(), 0);
 	}
 

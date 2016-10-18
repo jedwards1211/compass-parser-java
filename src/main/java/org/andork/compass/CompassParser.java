@@ -91,6 +91,17 @@ public class CompassParser {
 		}
 	}
 
+	public List<CompassTrip> parseCompassSurveyData(Segment segment) {
+		List<CompassTrip> trips = new ArrayList<CompassTrip>();
+		for (Segment tripText : segment.split("\f")) {
+			CompassTrip trip = parseTrip(tripText.trim());
+			if (trip != null) {
+				trips.add(trip);
+			}
+		}
+		return trips;
+	}
+
 	@SuppressWarnings("deprecation")
 	private Date parseDate(Segment segment) {
 		SegmentMatcher dateMatcher = new SegmentMatcher(segment, NON_WHITESPACE);
