@@ -1,5 +1,5 @@
 package org.andork.compass;
 
-public enum LrudMeasurement {
+public enum LrudItem {
 	LEFT, RIGHT, UP, DOWN
 }

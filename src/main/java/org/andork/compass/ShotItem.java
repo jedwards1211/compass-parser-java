@@ -1,5 +1,5 @@
 package org.andork.compass;
 
-public enum ShotMeasurement {
+public enum ShotItem {
 	LENGTH, AZIMUTH, INCLINATION
 }

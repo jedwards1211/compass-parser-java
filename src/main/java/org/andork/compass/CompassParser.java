@@ -123,29 +123,6 @@ public class CompassParser {
 		return new Date(year >= 100 ? year - 1900 : year, month - 1, day);
 	}
 
-	private void parseFormat(CompassTripHeader header, Segment format) {
-		int i = 0;
-		if (format.length() < 11) {
-			addError("format must be at least 11 characters long", format.substring(format.length()));
-			return;
-		}
-		header.setAzimuthUnit(parseAzimuthUnit(format.charAtAsSegment(i++)));
-		header.setLengthUnit(parseLengthUnit(format.charAtAsSegment(i++)));
-		header.setLrudUnit(parseLengthUnit(format.charAtAsSegment(i++)));
-		header.setInclinationUnit(parseInclinationUnit(format.charAtAsSegment(i++)));
-		parseMeasurements(format.substring(i), header.getLrudOrder(), this::parseLrudMeasurement, "lrud measurement");
-		i += 4;
-		parseMeasurements(format.substring(i), header.getShotMeasurementOrder(), this::parseShotMeasurement,
-				"shot measurement");
-		i += 3;
-		if (format.length() > i) {
-			header.setHasBacksights(format.charAt(i++) == 'B');
-		}
-		if (format.length() > i) {
-			header.setLrudAssociation(parseLrudAssociation(format.charAtAsSegment(i++)));
-		}
-	}
-
 	private InclinationUnit parseInclinationUnit(Segment unit) {
 		switch (Character.toUpperCase(unit.charAt(0))) {
 		case 'D':
@@ -186,7 +163,7 @@ public class CompassParser {
 		case 'M':
 			return LengthUnit.METERS;
 		default:
-			addError("unrecognized distance unit: " + unit.charAt(0), unit);
+			addError("unrecognized length unit: " + unit.charAt(0), unit);
 			return LengthUnit.DECIMAL_FEET;
 		}
 	}
@@ -198,25 +175,46 @@ public class CompassParser {
 		case 'T':
 			return LrudAssociation.TO;
 		default:
-			addError("unrecognized station side: " + segment.charAt(0), segment);
+			addError("unrecognized LRUD association: " + segment.charAt(0), segment);
 			return null;
 		}
 	}
 
-	private LrudMeasurement parseLrudMeasurement(Segment segment) {
+	private LrudItem parseLrudItem(Segment segment) {
 		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
-			return LrudMeasurement.LEFT;
+			return LrudItem.LEFT;
 		case 'R':
-			return LrudMeasurement.RIGHT;
+			return LrudItem.RIGHT;
 		case 'U':
-			return LrudMeasurement.UP;
+			return LrudItem.UP;
 		case 'D':
-			return LrudMeasurement.DOWN;
+			return LrudItem.DOWN;
 		default:
-			addError("unrecognized passage dimension measurement: " + segment.charAt(0), segment);
+			addError("unrecognized LRUD item: " + segment.charAt(0), segment);
 			return null;
 		}
+	}
+
+	private double parseLrudMeasurement(SegmentMatcher matcher, String fieldName) {
+		if (!matcher.find()) {
+			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
+			return Double.NaN;
+		}
+		double value;
+		try {
+			value = Double.parseDouble(matcher.group().toString());
+		} catch (NumberFormatException ex) {
+			addError("missing " + fieldName, matcher.group());
+			return Double.NaN;
+		}
+		if (value <= -9) {
+			return Double.NaN;
+		}
+		if (value < 0) {
+			addError(fieldName + " must be >= 0.0", matcher.group());
+		}
+		return value;
 	}
 
 	private double parseMeasurement(SegmentMatcher matcher, String fieldName) {
@@ -253,13 +251,13 @@ public class CompassParser {
 		return measurement;
 	}
 
-	private <T> void parseMeasurements(Segment segment, T[] measurements, Function<Segment, T> parser,
-			String measurementName) {
-		for (int i = 0; i < measurements.length; i++) {
+	private <T> void parseOrder(Segment segment, T[] order, Function<Segment, T> parser,
+			String itemName) {
+		for (int i = 0; i < order.length; i++) {
 			if (segment.length() <= i) {
-				addError("missing " + measurementName, segment.substring(segment.length()));
+				addError("missing " + itemName, segment.substring(segment.length()));
 			}
-			measurements[i] = parser.apply(segment.charAtAsSegment(i));
+			order[i] = parser.apply(segment.charAtAsSegment(i));
 		}
 	}
 
@@ -276,10 +274,10 @@ public class CompassParser {
 		shot.setLength(parseMeasurement(matcher, "length", 0));
 		shot.setFrontsightAzimuth(parseAzimuth(matcher, "frontsight azimuth"));
 		shot.setFrontsightInclination(parseMeasurement(matcher, "frontsight inclination", -90, 90));
-		shot.setLeft(parseMeasurement(matcher, "left", 0));
-		shot.setUp(parseMeasurement(matcher, "up", 0));
-		shot.setDown(parseMeasurement(matcher, "down", 0));
-		shot.setRight(parseMeasurement(matcher, "right", 0));
+		shot.setLeft(parseLrudMeasurement(matcher, "left"));
+		shot.setUp(parseLrudMeasurement(matcher, "up"));
+		shot.setDown(parseLrudMeasurement(matcher, "down"));
+		shot.setRight(parseLrudMeasurement(matcher, "right"));
 		if (tripHeader.hasBacksights()) {
 			shot.setBacksightAzimuth(parseAzimuth(matcher, "backsight azimuth"));
 			shot.setBacksightInclination(parseMeasurement(matcher, "backsight inclination", -90, 90));
@@ -318,16 +316,39 @@ public class CompassParser {
 		return shot;
 	}
 
-	private ShotMeasurement parseShotMeasurement(Segment segment) {
+	private void parseShotFormat(CompassTripHeader header, Segment format) {
+		int i = 0;
+		if (format.length() < 11) {
+			addError("format must be at least 11 characters long", format.substring(format.length()));
+			return;
+		}
+		header.setAzimuthUnit(parseAzimuthUnit(format.charAtAsSegment(i++)));
+		header.setLengthUnit(parseLengthUnit(format.charAtAsSegment(i++)));
+		header.setLrudUnit(parseLengthUnit(format.charAtAsSegment(i++)));
+		header.setInclinationUnit(parseInclinationUnit(format.charAtAsSegment(i++)));
+		parseOrder(format.substring(i), header.getLrudOrder(), this::parseLrudItem, "LRUD item");
+		i += 4;
+		parseOrder(format.substring(i), header.getShotMeasurementOrder(), this::parseShotItem,
+				"shot item");
+		i += 3;
+		if (format.length() > i) {
+			header.setHasBacksights(format.charAt(i++) == 'B');
+		}
+		if (format.length() > i) {
+			header.setLrudAssociation(parseLrudAssociation(format.charAtAsSegment(i++)));
+		}
+	}
+
+	private ShotItem parseShotItem(Segment segment) {
 		switch (Character.toUpperCase(segment.charAt(0))) {
 		case 'L':
-			return ShotMeasurement.LENGTH;
+			return ShotItem.LENGTH;
 		case 'A':
-			return ShotMeasurement.AZIMUTH;
+			return ShotItem.AZIMUTH;
 		case 'D':
-			return ShotMeasurement.INCLINATION;
+			return ShotItem.INCLINATION;
 		default:
-			addError("unrecognized shot measurement: " + segment.charAt(0), segment);
+			addError("unrecognized shot item: " + segment.charAt(0), segment);
 			return null;
 		}
 	}
@@ -376,7 +397,7 @@ public class CompassParser {
 				header.setDeclination(
 						parseMeasurement(new SegmentMatcher(value, NON_WHITESPACE), "declination"));
 			} else if (field.equalsIgnoreCase("FORMAT:")) {
-				parseFormat(header, value);
+				parseShotFormat(header, value);
 			} else if (field.equalsIgnoreCase("CORRECTIONS:")) {
 				SegmentMatcher matcher = new SegmentMatcher(value, NON_WHITESPACE);
 				header.setLengthCorrection(parseMeasurement(matcher, "length correction"));

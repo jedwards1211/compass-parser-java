@@ -205,16 +205,16 @@ public class CompassParserTests {
 		assertEquals(trip2.getHeader().getLengthUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(trip2.getHeader().getLrudUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(trip2.getHeader().getInclinationUnit(), InclinationUnit.DEGREES);
-		assertArrayEquals(trip2.getHeader().getLrudOrder(), new LrudMeasurement[] {
-				LrudMeasurement.LEFT,
-				LrudMeasurement.UP,
-				LrudMeasurement.DOWN,
-				LrudMeasurement.RIGHT,
+		assertArrayEquals(trip2.getHeader().getLrudOrder(), new LrudItem[] {
+				LrudItem.LEFT,
+				LrudItem.UP,
+				LrudItem.DOWN,
+				LrudItem.RIGHT,
 		});
-		assertArrayEquals(trip2.getHeader().getShotMeasurementOrder(), new ShotMeasurement[] {
-				ShotMeasurement.AZIMUTH,
-				ShotMeasurement.INCLINATION,
-				ShotMeasurement.LENGTH,
+		assertArrayEquals(trip2.getHeader().getShotMeasurementOrder(), new ShotItem[] {
+				ShotItem.AZIMUTH,
+				ShotItem.INCLINATION,
+				ShotItem.LENGTH,
 		});
 		assertFalse(trip2.getHeader().hasBacksights());
 		assertEquals(LrudAssociation.TO, trip2.getHeader().getLrudAssociation());
@@ -253,16 +253,16 @@ public class CompassParserTests {
 		assertEquals(header.getLengthUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(header.getLrudUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(header.getInclinationUnit(), InclinationUnit.DEGREES);
-		assertArrayEquals(header.getLrudOrder(), new LrudMeasurement[] {
-				LrudMeasurement.LEFT,
-				LrudMeasurement.UP,
-				LrudMeasurement.DOWN,
-				LrudMeasurement.RIGHT,
+		assertArrayEquals(header.getLrudOrder(), new LrudItem[] {
+				LrudItem.LEFT,
+				LrudItem.UP,
+				LrudItem.DOWN,
+				LrudItem.RIGHT,
 		});
-		assertArrayEquals(header.getShotMeasurementOrder(), new ShotMeasurement[] {
-				ShotMeasurement.AZIMUTH,
-				ShotMeasurement.INCLINATION,
-				ShotMeasurement.LENGTH,
+		assertArrayEquals(header.getShotMeasurementOrder(), new ShotItem[] {
+				ShotItem.AZIMUTH,
+				ShotItem.INCLINATION,
+				ShotItem.LENGTH,
 		});
 		assertFalse(header.hasBacksights());
 		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);

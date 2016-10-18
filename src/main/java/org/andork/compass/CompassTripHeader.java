@@ -49,16 +49,16 @@ public class CompassTripHeader {
 	 */
 	private InclinationUnit inclinationUnit = InclinationUnit.DEGREES;
 
-	private final LrudMeasurement[] lrudOrder = {
-			LrudMeasurement.LEFT,
-			LrudMeasurement.RIGHT,
-			LrudMeasurement.UP,
-			LrudMeasurement.DOWN,
+	private final LrudItem[] lrudOrder = {
+			LrudItem.LEFT,
+			LrudItem.RIGHT,
+			LrudItem.UP,
+			LrudItem.DOWN,
 	};
-	private final ShotMeasurement[] shotMeasurementOrder = {
-			ShotMeasurement.LENGTH,
-			ShotMeasurement.AZIMUTH,
-			ShotMeasurement.INCLINATION,
+	private final ShotItem[] shotMeasurementOrder = {
+			ShotItem.LENGTH,
+			ShotItem.AZIMUTH,
+			ShotItem.INCLINATION,
 	};
 	/**
 	 * Whether shots in this trip have backsights.
@@ -146,7 +146,7 @@ public class CompassTripHeader {
 		return lrudAssociation;
 	}
 
-	public LrudMeasurement[] getLrudOrder() {
+	public LrudItem[] getLrudOrder() {
 		return lrudOrder;
 	}
 
@@ -154,7 +154,7 @@ public class CompassTripHeader {
 		return lrudUnit;
 	}
 
-	public ShotMeasurement[] getShotMeasurementOrder() {
+	public ShotItem[] getShotMeasurementOrder() {
 		return shotMeasurementOrder;
 	}
 
