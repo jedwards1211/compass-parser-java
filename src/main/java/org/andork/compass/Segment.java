@@ -225,7 +225,11 @@ public class Segment implements CharSequence {
 		return value.regionMatches(toffset, other, ooffset, len);
 	}
 
-	private Segment[] split(Pattern p, int limit) {
+	public Segment[] split(Pattern p) {
+		return split(p, -1);
+	}
+
+	public Segment[] split(Pattern p, int limit) {
 		int index = 0;
 		boolean matchLimited = limit > 0;
 		ArrayList<Segment> matchList = new ArrayList<>();

@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.andork.compass.CompassParseError.Severity;
 
 public class CompassParser {
+	private static final Pattern EOL = Pattern.compile("\r|\n|\r\n");
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
 	private static final Pattern HEADER_FIELDS = Pattern
 			.compile("SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:");
@@ -297,6 +298,10 @@ public class CompassParser {
 		final CompassShot shot = new CompassShot();
 		shot.setFromStationName(parseString(matcher, "from station name"));
 		shot.setToStationName(parseString(matcher, "to station name"));
+		if (shot.getFromStationName() == null && shot.getToStationName() == null) {
+			return null;
+		}
+
 		shot.setLength(parseMeasurement(matcher, "length", 0));
 		shot.setFrontsightAzimuth(parseAzimuth(matcher, "frontsight azimuth"));
 		shot.setFrontsightInclination(parseMeasurement(matcher, "frontsight inclination", -90, 90));
@@ -378,6 +383,31 @@ public class CompassParser {
 			return null;
 		}
 		return matcher.group().toString();
+	}
+
+	public CompassTrip parseTrip(Segment segment) {
+		CompassTrip trip = new CompassTrip();
+		SegmentMatcher matcher = new SegmentMatcher(segment, EOL);
+		int i = 0;
+		int headerEnd = 0;
+		while (i < 8 && matcher.find()) {
+			i++;
+			headerEnd = matcher.end();
+		}
+		CompassTripHeader header = parseTripHeader(segment.substring(0, headerEnd));
+		trip.setHeader(header);
+
+		List<CompassShot> shots = new ArrayList<CompassShot>();
+
+		final Segment[] data = segment.substring(headerEnd).trim().split(EOL);
+		for (Segment line : data) {
+			CompassShot shot = parseShot(line, header);
+			if (shot != null) {
+				shots.add(shot);
+			}
+		}
+		trip.setShots(shots);
+		return trip;
 	}
 
 	public CompassTripHeader parseTripHeader(Segment segment) {
