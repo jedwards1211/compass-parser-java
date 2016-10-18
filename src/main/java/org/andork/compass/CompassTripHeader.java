@@ -35,19 +35,20 @@ public class CompassTripHeader {
 	/**
 	 * Display for shot lengths
 	 */
-	private LengthUnit lengthUnit;
+	private LengthUnit lengthUnit = LengthUnit.DECIMAL_FEET;
 	/**
 	 * Display unit for shot LRUDs
 	 */
-	private LengthUnit lrudUnit;
+	private LengthUnit lrudUnit = LengthUnit.DECIMAL_FEET;
 	/**
 	 * Display unit for shot azimuths
 	 */
-	private AzimuthUnit azimuthUnit;
+	private AzimuthUnit azimuthUnit = AzimuthUnit.DEGREES;
 	/**
 	 * Display unit for shot inclinations
 	 */
-	private InclinationUnit inclinationUnit;
+	private InclinationUnit inclinationUnit = InclinationUnit.DEGREES;
+
 	private final LrudMeasurement[] lrudOrder = {
 			LrudMeasurement.LEFT,
 			LrudMeasurement.RIGHT,
@@ -62,36 +63,36 @@ public class CompassTripHeader {
 	/**
 	 * Whether shots in this trip have backsights.
 	 */
-	private boolean hasBacksights;
+	private boolean hasBacksights = true;
 	/**
 	 * Whether LRUDs in this trip are associated with the from or to station of
 	 * shots.
 	 */
-	private LrudAssociation lrudAssociation;
+	private LrudAssociation lrudAssociation = LrudAssociation.FROM;
 	/**
 	 * Correction added to the length of each shot in this trip, in feet.
 	 */
-	private double lengthCorrection;
+	private double lengthCorrection = 0;
 	/**
 	 * Correction added to the frontsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private double frontsightAzimuthCorrection;
+	private double frontsightAzimuthCorrection = 0;
 	/**
 	 * Correction added to the frontsight inclination of each shot in this trip,
 	 * in degrees.
 	 */
-	private double frontsightInclinationCorrection;
+	private double frontsightInclinationCorrection = 0;
 	/**
 	 * Correction added to the backsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private double backsightAzimuthCorrection;
+	private double backsightAzimuthCorrection = 0;
 	/**
 	 * Correction added to the backsight inclination of each shot in this trip,
 	 * in degrees.
 	 */
-	private double backsightInclinationCorrection;
+	private double backsightInclinationCorrection = 0;
 
 	public AzimuthUnit getAzimuthUnit() {
 		return azimuthUnit;

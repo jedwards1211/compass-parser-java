@@ -1,5 +1,11 @@
 package org.andork.compass;
 
+/**
+ * Data for a shot between two stations.
+ *
+ * All <code>double</code> fields may be <code>NaN</code>, indicating the
+ * measurement is missing (which may mean the shot is invalid).
+ */
 public class CompassShot {
 	/**
 	 * The name of the from station
@@ -12,45 +18,45 @@ public class CompassShot {
 	/**
 	 * Distance between the two stations, in feet
 	 */
-	private double length;
+	private double length = Double.NaN;
 	/**
 	 * Compass bearing toward to station at from station, in degrees
 	 */
-	private double frontsightAzimuth;
+	private double frontsightAzimuth = Double.NaN;
 	/**
 	 * Vertical angle toward to station at from station, in degrees
 	 */
-	private double frontsightInclination;
+	private double frontsightInclination = Double.NaN;
 	/**
 	 * Compass bearing toward from station at to station, in degrees
 	 */
-	private double backsightAzimuth;
+	private double backsightAzimuth = Double.NaN;
 	/**
 	 * Vertical angle toward from station at to station, in degrees
 	 */
-	private double backsightInclination;
+	private double backsightInclination = Double.NaN;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private double left;
+	private double left = Double.NaN;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private double right;
+	private double right = Double.NaN;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the ceiling.
 	 */
-	private double up;
+	private double up = Double.NaN;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the floor.
 	 */
-	private double down;
+	private double down = Double.NaN;
 	/**
 	 * Arbitrary user comment for this shot
 	 */
@@ -59,20 +65,36 @@ public class CompassShot {
 	 * Whether to exclude this shot's {@link #length} from the total length of
 	 * the cave.
 	 */
-	private boolean excludeFromLength;
+	private boolean excludeFromLength = false;
 	/**
 	 * Whether to exclude this shot from plots.
 	 */
-	private boolean excludeFromPlotting;
+	private boolean excludeFromPlotting = false;
 	/**
 	 * Whether to exclude this shot from all processing.
 	 */
-	private boolean excludeFromAllProcessing;
+	private boolean excludeFromAllProcessing = false;
 	/**
 	 * If <code>true</code>, this shot should not be adjusted when closing
 	 * loops.
 	 */
-	private boolean doNotAdjust;
+	private boolean doNotAdjust = false;
+
+	public boolean doNotAdjust() {
+		return doNotAdjust;
+	}
+
+	public boolean excludeFromAllProcessing() {
+		return excludeFromAllProcessing;
+	}
+
+	public boolean excludeFromLength() {
+		return excludeFromLength;
+	}
+
+	public boolean excludeFromPlotting() {
+		return excludeFromPlotting;
+	}
 
 	public double getBacksightAzimuth() {
 		return backsightAzimuth;
@@ -120,22 +142,6 @@ public class CompassShot {
 
 	public double getUp() {
 		return up;
-	}
-
-	public boolean doNotAdjust() {
-		return doNotAdjust;
-	}
-
-	public boolean excludeFromAllProcessing() {
-		return excludeFromAllProcessing;
-	}
-
-	public boolean excludeFromLength() {
-		return excludeFromLength;
-	}
-
-	public boolean excludeFromPlotting() {
-		return excludeFromPlotting;
 	}
 
 	public void setBacksightAzimuth(double backsightAzimuth) {
