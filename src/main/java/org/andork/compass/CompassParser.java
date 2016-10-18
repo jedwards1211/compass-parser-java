@@ -33,17 +33,6 @@ public class CompassParser {
 
 	}
 
-	public boolean checkText(Segment segment, String text) {
-		if (!segment.startsWith(text)) {
-			errors.add(new CompassParseError(
-					CompassParseError.Severity.ERROR,
-					"expected " + text + " here",
-					segment.substring(0, Math.min(text.length(), segment.length()))));
-			return false;
-		}
-		return true;
-	}
-
 	public List<CompassParseError> getErrors() {
 		return Collections.unmodifiableList(errors);
 	}
