@@ -400,11 +400,13 @@ public class CompassParser {
 
 		List<CompassShot> shots = new ArrayList<CompassShot>();
 
-		final Segment[] data = parts[1].split(EOL);
-		for (Segment line : data) {
-			CompassShot shot = parseShot(line, header);
-			if (shot != null) {
-				shots.add(shot);
+		if (!parts[1].isEmpty()) {
+			final Segment[] data = parts[1].split(EOL);
+			for (Segment line : data) {
+				CompassShot shot = parseShot(line, header);
+				if (shot != null) {
+					shots.add(shot);
+				}
 			}
 		}
 		trip.setShots(shots);
