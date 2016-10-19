@@ -1,7 +1,10 @@
 package org.andork.compass;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,7 +116,18 @@ public class CompassParser {
 		}
 	}
 
-	public List<CompassTrip> parseCompassSurveyData(Segment segment) {
+	/**
+	 * Parses the file at the given {@code path}.
+	 */
+	public List<CompassTrip> parseCompassSurveyData(Path path) throws IOException {
+		byte[] bytes = Files.readAllBytes(path);
+		return parseCompassSurveyData(new Segment(new String(bytes), path, 0, 0));
+	}
+
+	/**
+	 * Parses the data in the given {@link Segment}.
+	 */
+	List<CompassTrip> parseCompassSurveyData(Segment segment) {
 		List<CompassTrip> trips = new ArrayList<CompassTrip>();
 		for (Segment text : segment.split(Pattern.compile("\f"))) {
 			CompassTrip trip = parseTrip(text.trim());
@@ -122,6 +136,20 @@ public class CompassParser {
 			}
 		}
 		return trips;
+	}
+
+	/**
+	 * Parses the given {@code data}.
+	 *
+	 * @param data
+	 *            the data to parse
+	 * @param source
+	 *            If any errors or warnings are generated they will reference
+	 *            this object. For instance you can pass a {@link File},
+	 *            {@link Path}, or {@link URL}.
+	 */
+	public List<CompassTrip> parseCompassSurveyData(String data, Object source) {
+		return parseCompassSurveyData(new Segment(data, source, 0, 0));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -323,13 +351,13 @@ public class CompassParser {
 					final char flag = flags.charAt(i);
 					switch (Character.toUpperCase(flag)) {
 					case 'L':
-						shot.setExcludeFromLength(true);
+						shot.setExcludedFromLength(true);
 						break;
 					case 'P':
-						shot.setExcludeFromPlotting(true);
+						shot.setExcludedFromPlotting(true);
 						break;
 					case 'X':
-						shot.setExcludeFromAllProcessing(true);
+						shot.setExcludedFromAllProcessing(true);
 						break;
 					case 'C':
 						shot.setDoNotAdjust(true);

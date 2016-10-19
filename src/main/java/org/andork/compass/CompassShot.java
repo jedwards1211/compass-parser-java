@@ -66,35 +66,35 @@ public class CompassShot {
 	 * Whether to exclude this shot's {@link #length} from the total length of
 	 * the cave.
 	 */
-	private boolean excludeFromLength = false;
+	private boolean excludedFromLength = false;
 	/**
 	 * Whether to exclude this shot from plots.
 	 */
-	private boolean excludeFromPlotting = false;
+	private boolean excludedFromPlotting = false;
 	/**
 	 * Whether to exclude this shot from all processing.
 	 */
-	private boolean excludeFromAllProcessing = false;
+	private boolean excludedFromAllProcessing = false;
 	/**
 	 * If <code>true</code>, this shot should not be adjusted when closing
 	 * loops.
 	 */
 	private boolean doNotAdjust = false;
 
-	public boolean doNotAdjust() {
+	public boolean isDoNotAdjust() {
 		return doNotAdjust;
 	}
 
-	public boolean excludeFromAllProcessing() {
-		return excludeFromAllProcessing;
+	public boolean isExcludedFromAllProcessing() {
+		return excludedFromAllProcessing;
 	}
 
-	public boolean excludeFromLength() {
-		return excludeFromLength;
+	public boolean isExcludedFromLength() {
+		return excludedFromLength;
 	}
 
-	public boolean excludeFromPlotting() {
-		return excludeFromPlotting;
+	public boolean isExcludedFromPlotting() {
+		return excludedFromPlotting;
 	}
 
 	public double getBacksightAzimuth() {
@@ -165,16 +165,16 @@ public class CompassShot {
 		this.down = down;
 	}
 
-	public void setExcludeFromAllProcessing(boolean excludeFromAllProcessing) {
-		this.excludeFromAllProcessing = excludeFromAllProcessing;
+	public void setExcludedFromAllProcessing(boolean excludeFromAllProcessing) {
+		this.excludedFromAllProcessing = excludeFromAllProcessing;
 	}
 
-	public void setExcludeFromLength(boolean excludeFromLength) {
-		this.excludeFromLength = excludeFromLength;
+	public void setExcludedFromLength(boolean excludeFromLength) {
+		this.excludedFromLength = excludeFromLength;
 	}
 
-	public void setExcludeFromPlotting(boolean excludeFromPlotting) {
-		this.excludeFromPlotting = excludeFromPlotting;
+	public void setExcludedFromPlotting(boolean excludeFromPlotting) {
+		this.excludedFromPlotting = excludeFromPlotting;
 	}
 
 	public void setFromStationName(String fromStationName) {
@@ -207,5 +207,20 @@ public class CompassShot {
 
 	public void setUp(double up) {
 		this.up = up;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CompassShot [fromStationName=").append(fromStationName).append(", toStationName=")
+				.append(toStationName).append(", length=").append(length).append(", frontsightAzimuth=")
+				.append(frontsightAzimuth).append(", frontsightInclination=").append(frontsightInclination)
+				.append(", backsightAzimuth=").append(backsightAzimuth).append(", backsightInclination=")
+				.append(backsightInclination).append(", left=").append(left).append(", right=").append(right)
+				.append(", up=").append(up).append(", down=").append(down).append(", comment=").append(comment)
+				.append(", excludedFromLength=").append(excludedFromLength).append(", excludedFromPlotting=")
+				.append(excludedFromPlotting).append(", excludedFromAllProcessing=").append(excludedFromAllProcessing)
+				.append(", doNotAdjust=").append(doNotAdjust).append("]");
+		return builder.toString();
 	}
 }

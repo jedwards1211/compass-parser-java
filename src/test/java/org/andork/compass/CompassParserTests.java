@@ -48,38 +48,38 @@ public class CompassParserTests {
 		CompassShot shot;
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|L#", "test.txt", 0, 0),
 				header);
-		assertTrue(shot.excludeFromLength());
-		assertFalse(shot.excludeFromPlotting());
-		assertFalse(shot.excludeFromAllProcessing());
-		assertFalse(shot.doNotAdjust());
+		assertTrue(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertFalse(shot.isDoNotAdjust());
 
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|P#", "test.txt", 0, 0),
 				header);
-		assertFalse(shot.excludeFromLength());
-		assertTrue(shot.excludeFromPlotting());
-		assertFalse(shot.excludeFromAllProcessing());
-		assertFalse(shot.doNotAdjust());
+		assertFalse(shot.isExcludedFromLength());
+		assertTrue(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertFalse(shot.isDoNotAdjust());
 
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|X#", "test.txt", 0, 0),
 				header);
-		assertFalse(shot.excludeFromLength());
-		assertFalse(shot.excludeFromPlotting());
-		assertTrue(shot.excludeFromAllProcessing());
-		assertFalse(shot.doNotAdjust());
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertTrue(shot.isExcludedFromAllProcessing());
+		assertFalse(shot.isDoNotAdjust());
 
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|C#", "test.txt", 0, 0),
 				header);
-		assertFalse(shot.excludeFromLength());
-		assertFalse(shot.excludeFromPlotting());
-		assertFalse(shot.excludeFromAllProcessing());
-		assertTrue(shot.doNotAdjust());
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertTrue(shot.isDoNotAdjust());
 
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LCP#", "test.txt", 0, 0),
 				header);
-		assertTrue(shot.excludeFromLength());
-		assertTrue(shot.excludeFromPlotting());
-		assertFalse(shot.excludeFromAllProcessing());
-		assertTrue(shot.doNotAdjust());
+		assertTrue(shot.isExcludedFromLength());
+		assertTrue(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertTrue(shot.isDoNotAdjust());
 
 		assertEquals(parser.getErrors().size(), 0);
 
@@ -123,15 +123,11 @@ public class CompassParserTests {
 		Segment segment = new Segment(text, "test.txt", 0, 0);
 		parser.parseShot(segment, header);
 
-		assertEquals(parser.getErrors().size(), 2);
+		assertEquals(1, parser.getErrors().size());
 		assertTrue(parser.getErrors().stream().anyMatch(error -> error.equals(new CompassParseError(
 				Severity.ERROR,
 				"length must be >= 0.0",
 				extract(segment, "-4.25")))));
-		assertTrue(parser.getErrors().stream().anyMatch(error -> error.equals(new CompassParseError(
-				Severity.ERROR,
-				"up must be >= 0.0",
-				extract(segment, "-3.50")))));
 	}
 
 	@Test
@@ -151,9 +147,9 @@ public class CompassParserTests {
 		assertEquals(shot.getUp(), 3.5, 0.0);
 		assertEquals(shot.getDown(), 0.75, 0.0);
 		assertEquals(shot.getRight(), 0.5, 0.0);
-		assertFalse(shot.excludeFromLength());
-		assertFalse(shot.excludeFromPlotting());
-		assertFalse(shot.excludeFromAllProcessing());
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
 		assertEquals(shot.getComment(), "");
 		assertEquals(parser.getErrors().size(), 0);
 	}
