@@ -1,5 +1,8 @@
 package org.andork.compass;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -14,19 +17,44 @@ import org.andork.segment.SegmentMatcher;
 
 public class CompassParser {
 	private static final Pattern EOL = Pattern.compile("\r\n|\r|\n");
+	private static final Pattern COLUMN_HEADER = Pattern.compile("^\\s*FROM\\s+TO[^\r\n]+(\r\n|\r|\n){2}",
+			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
 	private static final Pattern HEADER_FIELDS = Pattern.compile(
 			"SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:",
 			Pattern.CASE_INSENSITIVE);
 
-	static Segment[] splitHeaderAndData(Segment segment) {
-		SegmentMatcher matcher = new SegmentMatcher(segment, EOL);
-		int i = 0;
-		int headerEnd = 0;
-		while (i < 8 && matcher.find()) {
-			i++;
-			headerEnd = matcher.end();
+	public static void main(String[] args) {
+		if (args.length == 0) {
+			System.out.println("Usage: java " + CompassParser.class.getName() + " <compass file> [<compass files...>]");
+			return;
 		}
+
+		final CompassParser parser = new CompassParser();
+		try {
+			for (String file : args) {
+				final byte[] bytes = Files.readAllBytes(Paths.get(file));
+				final Segment segment = new Segment(new String(bytes), file, 0, 0);
+				parser.parseCompassSurveyData(segment);
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			System.exit(1);
+		}
+
+		if (parser.getErrors().isEmpty()) {
+			System.out.println("No errors!");
+			return;
+		}
+		for (CompassParseError error : parser.getErrors()) {
+			System.out.println(error);
+		}
+		System.exit(1);
+	}
+
+	static Segment[] splitHeaderAndData(Segment segment) {
+		SegmentMatcher matcher = new SegmentMatcher(segment, COLUMN_HEADER);
+		int headerEnd = matcher.find() ? matcher.end() : segment.length();
 		return new Segment[] { segment.substring(0, headerEnd).trim(), segment.substring(headerEnd).trim() };
 	}
 
@@ -60,7 +88,7 @@ public class CompassParser {
 			lastMatch = matcher.group().toString();
 			lastEnd = matcher.end();
 		}
-		iteratee.accept(lastMatch, matcher.segment().substring(lastEnd));
+		iteratee.accept(lastMatch, matcher.segment().substring(lastEnd).trim());
 	}
 
 	double parseAzimuth(SegmentMatcher matcher, String fieldName) {
@@ -87,8 +115,8 @@ public class CompassParser {
 
 	public List<CompassTrip> parseCompassSurveyData(Segment segment) {
 		List<CompassTrip> trips = new ArrayList<CompassTrip>();
-		for (Segment tripText : segment.split("\f")) {
-			CompassTrip trip = parseTrip(tripText.trim());
+		for (Segment text : segment.split(Pattern.compile("\f"))) {
+			CompassTrip trip = parseTrip(text.trim());
 			if (trip != null) {
 				trips.add(trip);
 			}
@@ -219,7 +247,7 @@ public class CompassParser {
 
 	double parseMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
-			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
+			addError("missing " + fieldName, matcher.segment().substring(matcher.regionEnd()));
 			return Double.NaN;
 		}
 		double value;
@@ -355,7 +383,7 @@ public class CompassParser {
 
 	String parseString(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
-			addError("missing " + fieldName, matcher.group());
+			addError("missing " + fieldName, matcher.segment().substring(matcher.segment().length()));
 			return null;
 		}
 		return matcher.group().toString();
@@ -365,6 +393,9 @@ public class CompassParser {
 		final Segment[] parts = splitHeaderAndData(segment);
 		CompassTrip trip = new CompassTrip();
 		CompassTripHeader header = parseTripHeader(parts[0]);
+		if (header == null) {
+			return null;
+		}
 		trip.setHeader(header);
 
 		List<CompassShot> shots = new ArrayList<CompassShot>();
@@ -383,6 +414,9 @@ public class CompassParser {
 	public CompassTripHeader parseTripHeader(Segment segment) {
 		final CompassTripHeader header = new CompassTripHeader();
 		final Segment[] parts = segment.trim().split(EOL, 2);
+		if (parts.length < 2) {
+			return null;
+		}
 		header.setCaveName(parts[0].toString());
 		getFields(new SegmentMatcher(parts[1], HEADER_FIELDS), (field, value) -> {
 			if (field.equalsIgnoreCase("SURVEY NAME:")) {
