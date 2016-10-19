@@ -4,7 +4,8 @@ package org.andork.compass;
  * Data for a shot between two stations.
  *
  * All <code>double</code> fields may be <code>NaN</code>, indicating the
- * measurement is missing (which may mean the shot is invalid).
+ * measurement is missing (in the case of length, azimuth, or inclination) or
+ * passage (in the case of LRUDs).
  */
 public class CompassShot {
 	/**
