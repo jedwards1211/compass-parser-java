@@ -324,11 +324,11 @@ public class CompassParser {
 		final CompassShot shot = new CompassShot();
 		shot.setFromStationName(parseString(matcher, "from station name"));
 		shot.setToStationName(parseString(matcher, "to station name"));
-		if (shot.getFromStationName() == null && shot.getToStationName() == null) {
+		shot.setLength(parseMeasurement(matcher, "length", 0));
+		if (Double.isNaN(shot.getLength()) && matcher.hitEnd()) {
 			return null;
 		}
 
-		shot.setLength(parseMeasurement(matcher, "length", 0));
 		shot.setFrontsightAzimuth(parseAzimuth(matcher, "frontsight azimuth"));
 		shot.setFrontsightInclination(parseMeasurement(matcher, "frontsight inclination", -90, 90));
 		shot.setLeft(parseLrudMeasurement(matcher, "left"));
@@ -369,7 +369,10 @@ public class CompassParser {
 				}
 			}
 		}
-		shot.setComment(segment.substring(commentStart).toString().trim());
+		String comment = segment.substring(commentStart).toString().trim();
+		if (!comment.isEmpty()) {
+			shot.setComment(comment);
+		}
 		return shot;
 	}
 

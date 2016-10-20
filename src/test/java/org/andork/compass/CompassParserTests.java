@@ -3,8 +3,10 @@ package org.andork.compass;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -93,6 +95,31 @@ public class CompassParserTests {
 	}
 
 	@Test
+	public void incompleteShotTests() {
+		CompassParser parser;
+		Segment segment;
+
+		final CompassTripHeader header = new CompassTripHeader();
+		header.setHasBacksights(false);
+
+		parser = new CompassParser();
+		segment = new Segment("A3", "test.txt", 0, 0);
+		assertNull(parser.parseShot(segment, header));
+		assertEquals(2, parser.getErrors().size());
+		assertEquals(Arrays.asList(
+				new CompassParseError(Severity.ERROR, "missing to station name", segment.substring(segment.length())),
+				new CompassParseError(Severity.ERROR, "missing length", segment.substring(segment.length()))),
+				parser.getErrors());
+
+		parser = new CompassParser();
+		segment = new Segment("A3 A4", "test.txt", 0, 0);
+		assertNull(parser.parseShot(segment, header));
+		assertEquals(Arrays.asList(
+				new CompassParseError(Severity.ERROR, "missing length", segment.substring(segment.length()))),
+				parser.getErrors());
+	}
+
+	@Test
 	public void incTests() {
 		final CompassParser parser = new CompassParser();
 		final CompassTripHeader header = new CompassTripHeader();
@@ -131,6 +158,85 @@ public class CompassParserTests {
 	}
 
 	@Test
+	public void testFlagsAndComments() {
+		CompassParser parser;
+		CompassTripHeader header;
+		CompassShot shot;
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(false);
+		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LX#", "test.txt", 0, 0),
+				header);
+		assertTrue(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertTrue(shot.isExcludedFromAllProcessing());
+		assertNull(shot.getComment());
+		assertEquals(parser.getErrors().size(), 0);
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(false);
+		shot = parser.parseShot(
+				new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LX#  blah blah", "test.txt", 0, 0),
+				header);
+		assertTrue(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertTrue(shot.isExcludedFromAllProcessing());
+		assertEquals(shot.getComment(), "blah blah");
+		assertEquals(parser.getErrors().size(), 0);
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(false);
+		shot = parser.parseShot(
+				new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50  blah blah", "test.txt", 0, 0),
+				header);
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertEquals(shot.getComment(), "blah blah");
+		assertEquals(parser.getErrors().size(), 0);
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(true);
+		shot = parser.parseShot(
+				new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 195.0 85.0 #|LX#", "test.txt", 0, 0),
+				header);
+		assertTrue(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertTrue(shot.isExcludedFromAllProcessing());
+		assertNull(shot.getComment());
+		assertEquals(parser.getErrors().size(), 0);
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(true);
+		shot = parser.parseShot(
+				new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 195.0 85.0 #|LX#  blah blah", "test.txt", 0,
+						0),
+				header);
+		assertTrue(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertTrue(shot.isExcludedFromAllProcessing());
+		assertEquals(shot.getComment(), "blah blah");
+		assertEquals(parser.getErrors().size(), 0);
+
+		parser = new CompassParser();
+		header = new CompassTripHeader();
+		header.setHasBacksights(true);
+		shot = parser.parseShot(
+				new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 195.0 85.0  blah blah", "test.txt", 0, 0),
+				header);
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertEquals(shot.getComment(), "blah blah");
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@Test
 	public void testParseBasicShot() {
 		final CompassParser parser = new CompassParser();
 		final CompassTripHeader header = new CompassTripHeader();
@@ -150,7 +256,7 @@ public class CompassParserTests {
 		assertFalse(shot.isExcludedFromLength());
 		assertFalse(shot.isExcludedFromPlotting());
 		assertFalse(shot.isExcludedFromAllProcessing());
-		assertEquals(shot.getComment(), "");
+		assertNull(shot.getComment());
 		assertEquals(parser.getErrors().size(), 0);
 	}
 
@@ -262,6 +368,33 @@ public class CompassParserTests {
 		});
 		assertFalse(header.hasBacksights());
 		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@Test
+	public void testParseShotWithBacksights() {
+		final CompassParser parser = new CompassParser();
+		final CompassTripHeader header = new CompassTripHeader();
+		header.setHasBacksights(true);
+
+		final CompassShot shot = parser
+				.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 195.0 85.00", "test.txt", 0, 0),
+						header);
+		assertEquals(shot.getFromStationName(), "A3");
+		assertEquals(shot.getToStationName(), "A4");
+		assertEquals(shot.getLength(), 4.25, 0.0);
+		assertEquals(shot.getFrontsightAzimuth(), 15.0, 0.0);
+		assertEquals(shot.getFrontsightInclination(), -85.0, 0.0);
+		assertEquals(shot.getLeft(), 5.0, 0.0);
+		assertEquals(shot.getUp(), 3.5, 0.0);
+		assertEquals(shot.getDown(), 0.75, 0.0);
+		assertEquals(shot.getRight(), 0.5, 0.0);
+		assertEquals(shot.getBacksightAzimuth(), 195.0, 0.0);
+		assertEquals(shot.getBacksightInclination(), 85.0, 0.0);
+		assertFalse(shot.isExcludedFromLength());
+		assertFalse(shot.isExcludedFromPlotting());
+		assertFalse(shot.isExcludedFromAllProcessing());
+		assertNull(shot.getComment());
 		assertEquals(parser.getErrors().size(), 0);
 	}
 
