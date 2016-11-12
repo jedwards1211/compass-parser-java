@@ -264,7 +264,7 @@ public class CompassParser {
 			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
-		if (value < -1) {
+		if (value < -1 || value == 999) {
 			return Double.NaN;
 		}
 		// Compass barfs on LRUDs between -1 and 0
@@ -286,7 +286,7 @@ public class CompassParser {
 			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
-		if (value <= -900) {
+		if (value == -999 || value == 999) {
 			return Double.NaN;
 		}
 		return value;
@@ -338,6 +338,9 @@ public class CompassParser {
 		if (tripHeader.hasBacksights()) {
 			shot.setBacksightAzimuth(parseAzimuth(matcher, "backsight azimuth"));
 			shot.setBacksightInclination(parseMeasurement(matcher, "backsight inclination", -90, 90));
+		}
+		if (matcher.hitEnd()) {
+			return shot;
 		}
 		int commentStart = matcher.end();
 		if (matcher.find()) {
