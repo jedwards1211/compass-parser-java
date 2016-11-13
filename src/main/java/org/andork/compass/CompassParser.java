@@ -264,7 +264,7 @@ public class CompassParser {
 			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
-		if (value < -1 || value == 999) {
+		if (value < -1 || value > 990) {
 			return Double.NaN;
 		}
 		// Compass barfs on LRUDs between -1 and 0
@@ -286,7 +286,7 @@ public class CompassParser {
 			addError("missing " + fieldName, matcher.group());
 			return Double.NaN;
 		}
-		if (value == -999 || value == 999) {
+		if (value < -990 || value > 990) {
 			return Double.NaN;
 		}
 		return value;
