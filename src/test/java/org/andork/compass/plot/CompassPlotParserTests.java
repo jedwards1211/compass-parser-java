@@ -51,7 +51,7 @@ public class CompassPlotParserTests {
 
 	@Test
 	public void testInvalidParseDrawSurveyCommand() {
-		assertThrowsParseError(() -> parseDrawSurveyCommand("Q"), 0, "invalid command: Q");
+		assertThrowsParseError(() -> parseDrawSurveyCommand("Q"), 0, "invalid command (expected M or D)");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D X"), 2, "invalid northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D128.2"), 1, "missing whitespace before northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D 128.2-65.9"), 7, "missing whitespace before easting");
@@ -64,7 +64,7 @@ public class CompassPlotParserTests {
 
 	@Test
 	public void testInvalidParseFeatureCommand() {
-		assertThrowsParseError(() -> parseFeatureCommand("Q"), 0, "command should be L");
+		assertThrowsParseError(() -> parseFeatureCommand("Q"), 0, "invalid command (expected L)");
 		assertThrowsParseError(() -> parseFeatureCommand("L X"), 2, "invalid northing");
 		assertThrowsParseError(() -> parseFeatureCommand("L128.2"), 1, "missing whitespace before northing");
 		assertThrowsParseError(() -> parseFeatureCommand("L 128.2-65.9"), 7, "missing whitespace before easting");

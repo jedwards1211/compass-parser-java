@@ -1,5 +1,7 @@
 package org.andork.compass.plot;
 
+import static org.andork.segment.SegmentParser.missingOrInvalid;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +18,9 @@ public class CompassPlotParser {
 		return errors;
 	}
 
-	private BigDecimal lrudMeasurement(SegmentParser p, String name) {
+	private BigDecimal lrudMeasurement(SegmentParser p, String which) {
 		try {
-			BigDecimal value = p.bigDecimal("invalid " + name);
+			BigDecimal value = p.bigDecimal(missingOrInvalid(which));
 			return value.compareTo(BigDecimal.ZERO) < 0 ? null : value;
 		} catch (SegmentParseException e) {
 			errors.add(new CompassParseError(e));
@@ -29,7 +31,7 @@ public class CompassPlotParser {
 
 	public DrawSurveyCommand parseDrawSurveyCommand(SegmentParser p) throws SegmentParseException {
 		DrawOperation op;
-		switch (p.character("missing command (M or D)")) {
+		switch (p.match("[MD]", missingOrInvalid("command (expected M or D)")).charAt(0)) {
 		case 'M':
 			op = DrawOperation.MOVE_TO;
 			break;
@@ -37,24 +39,23 @@ public class CompassPlotParser {
 			op = DrawOperation.LINE_TO;
 			break;
 		default:
-			p.move(-1).throwException("invalid command: " + p.charAtIndex());
-			return null;
+			throw new RuntimeException("how can this happen");
 		}
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.bigDecimal("invalid northing"));
+		command.getLocation().setNorthing(p.bigDecimal(missingOrInvalid("northing")));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.bigDecimal("invalid easting"));
+		command.getLocation().setEasting(p.bigDecimal(missingOrInvalid("easting")));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.bigDecimal("invalid vertical"));
+		command.getLocation().setVertical(p.bigDecimal(missingOrInvalid("vertical")));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
 			if (p.atEnd()) {
 				break;
 			}
-			switch (p.character("expected command (S, P, or I)")) {
+			switch (p.match("[SPI]", missingOrInvalid("command (expected S, P, or I)")).charAt(0)) {
 			case 'S':
 				command.setStationName(p.nonwhitespace("missing station name").toString());
 				break;
@@ -71,7 +72,7 @@ public class CompassPlotParser {
 			case 'I':
 				p.whitespace("missing whitespace before distance from entrance");
 				int start = p.getIndex();
-				command.setDistanceFromEntrance(p.bigDecimal("invalid distance from entrance"));
+				command.setDistanceFromEntrance(p.bigDecimal(missingOrInvalid("distance from entrance")));
 				if (command.getDistanceFromEntrance().compareTo(BigDecimal.ZERO) < 0) {
 					errors.add(new CompassParseError(
 							Severity.WARNING, "distance from entrance is negative",
@@ -79,7 +80,7 @@ public class CompassPlotParser {
 				}
 				break;
 			default:
-				p.move(-1).throwException("unknown command: " + p.charAtIndex());
+				break;
 			}
 		}
 
@@ -87,22 +88,22 @@ public class CompassPlotParser {
 	}
 
 	public FeatureCommand parseFeatureCommand(SegmentParser p) throws SegmentParseException {
-		p.character('L', "command should be L");
+		p.character('L', missingOrInvalid("command (expected L)"));
 		FeatureCommand command = new FeatureCommand();
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.bigDecimal("invalid northing"));
+		command.getLocation().setNorthing(p.bigDecimal(missingOrInvalid("northing")));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.bigDecimal("invalid easting"));
+		command.getLocation().setEasting(p.bigDecimal(missingOrInvalid("easting")));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.bigDecimal("invalid vertical"));
+		command.getLocation().setVertical(p.bigDecimal(missingOrInvalid("vertical")));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
 			if (p.atEnd()) {
 				return command;
 			}
-			switch (p.character("expected command (S, P, or V)")) {
+			switch (p.match("[SPV]", missingOrInvalid("command (expected S, P, or V)")).charAt(0)) {
 			case 'S':
 				command.setStationName(p.nonwhitespace("missing station name").toString());
 				break;
@@ -118,10 +119,10 @@ public class CompassPlotParser {
 				break;
 			case 'V':
 				p.whitespace("missing whitespace before value");
-				command.setValue(p.bigDecimal("invalid value"));
+				command.setValue(p.bigDecimal(missingOrInvalid("value")));
 				break;
 			default:
-				p.move(-1).throwException("unknown command: " + p.charAtIndex());
+				break;
 			}
 		}
 
