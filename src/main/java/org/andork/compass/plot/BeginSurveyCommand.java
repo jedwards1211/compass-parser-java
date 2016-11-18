@@ -30,4 +30,12 @@ public class BeginSurveyCommand implements CompassPlotCommand {
 	public void setSurveyName(String surveyName) {
 		this.surveyName = surveyName;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BeginSurveyCommand [surveyName=").append(surveyName).append(", date=").append(date)
+				.append(", comment=").append(comment).append("]");
+		return builder.toString();
+	}
 }

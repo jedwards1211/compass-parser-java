@@ -15,4 +15,11 @@ public class BeginSectionCommand implements CompassPlotCommand {
 	public void setSectionName(String sectionName) {
 		this.sectionName = sectionName;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BeginSectionCommand [sectionName=").append(sectionName).append("]");
+		return builder.toString();
+	}
 }

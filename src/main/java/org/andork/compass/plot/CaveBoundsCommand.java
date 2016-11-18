@@ -24,4 +24,12 @@ public class CaveBoundsCommand implements BoundsCommand {
 	public void setDistanceToFarthestStation(BigDecimal distanceToFarthestStation) {
 		this.distanceToFarthestStation = distanceToFarthestStation;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CaveBoundsCommand [lowerBound=").append(lowerBound).append(", upperBound=").append(upperBound)
+				.append(", distanceToFarthestStation=").append(distanceToFarthestStation).append("]");
+		return builder.toString();
+	}
 }

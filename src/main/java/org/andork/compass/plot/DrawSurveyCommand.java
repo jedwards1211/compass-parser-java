@@ -14,7 +14,7 @@ public class DrawSurveyCommand implements LocationCommand {
 	private BigDecimal distanceFromEntrance = BigDecimal.ZERO;
 
 	public DrawSurveyCommand(DrawOperation operation) {
-		operation = Objects.requireNonNull(operation);
+		this.operation = Objects.requireNonNull(operation);
 	}
 
 	/**
@@ -89,5 +89,15 @@ public class DrawSurveyCommand implements LocationCommand {
 	@Override
 	public void setUp(BigDecimal up) {
 		this.up = up;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DrawSurveyCommand [operation=").append(operation).append(", location=").append(location)
+				.append(", stationName=").append(stationName).append(", left=").append(left).append(", right=")
+				.append(right).append(", up=").append(up).append(", down=").append(down)
+				.append(", distanceFromEntrance=").append(distanceFromEntrance).append("]");
+		return builder.toString();
 	}
 }

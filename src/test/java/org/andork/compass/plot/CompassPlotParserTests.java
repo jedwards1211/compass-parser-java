@@ -1,5 +1,6 @@
 package org.andork.compass.plot;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -147,5 +148,15 @@ public class CompassPlotParserTests {
 		Assert.assertEquals(line.indexOf("b3.0"), errors.get(1).getSegment().startCol);
 		Assert.assertEquals(line.indexOf(". "), errors.get(2).getSegment().startCol);
 		Assert.assertEquals(line.indexOf("%2.0"), errors.get(3).getSegment().startCol);
+	}
+
+	@Test
+	public void testFullParse() throws IOException {
+		CompassPlotParser parser = new CompassPlotParser();
+		parser.parsePlot(getClass().getResourceAsStream("testplot.plt"), "testplot.plt");
+		Assert.assertEquals(0, parser.getErrors().size());
+		for (CompassPlotCommand command : parser.getCommands()) {
+			System.out.println(command);
+		}
 	}
 }

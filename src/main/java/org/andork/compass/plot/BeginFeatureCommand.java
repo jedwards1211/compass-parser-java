@@ -36,4 +36,12 @@ public class BeginFeatureCommand implements CompassPlotCommand {
 	public void setMinValue(BigDecimal minValue) {
 		this.minValue = minValue;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BeginFeatureCommand [featureName=").append(featureName).append(", minValue=").append(minValue)
+				.append(", maxValue=").append(maxValue).append("]");
+		return builder.toString();
+	}
 }

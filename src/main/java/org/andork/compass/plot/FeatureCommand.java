@@ -76,4 +76,14 @@ public class FeatureCommand implements LocationCommand {
 	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FeatureCommand [location=").append(location).append(", stationName=").append(stationName)
+				.append(", left=").append(left).append(", right=").append(right).append(", up=").append(up)
+				.append(", down=").append(down).append(", value=").append(value).append("]");
+		return builder.toString();
+	}
+
 }
