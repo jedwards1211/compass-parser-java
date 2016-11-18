@@ -1,8 +1,9 @@
 package org.andork.compass;
 
 import org.andork.segment.Segment;
+import org.andork.segment.SegmentParseException;
 
-public class CompassParseError extends Exception {
+public class CompassParseError {
 	public static enum Severity {
 		ERROR, WARNING
 	}
@@ -10,6 +11,10 @@ public class CompassParseError extends Exception {
 	private final Severity severity;
 	private final String message;
 	private final Segment segment;
+
+	public CompassParseError(SegmentParseException e) {
+		this(Severity.ERROR, e.getMessage(), e.getSegment());
+	}
 
 	public CompassParseError(Severity severity, String message, Segment segment) {
 		super();
@@ -50,7 +55,6 @@ public class CompassParseError extends Exception {
 		return true;
 	}
 
-	@Override
 	public String getMessage() {
 		return message;
 	}

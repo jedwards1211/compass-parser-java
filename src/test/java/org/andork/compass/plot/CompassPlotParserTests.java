@@ -6,8 +6,9 @@ import java.util.concurrent.Callable;
 
 import org.andork.compass.CompassParseError;
 import org.andork.compass.ExceptionRunnable;
-import org.andork.compass.LineParser;
 import org.andork.segment.Segment;
+import org.andork.segment.SegmentParseException;
+import org.andork.segment.SegmentParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,9 +16,9 @@ public class CompassPlotParserTests {
 	private static void assertThrowsParseError(Callable<?> c, int index, String message) {
 		try {
 			c.call();
-			Assert.fail("expected function to throw a CompassParseError");
+			Assert.fail("expected function to throw a SegmentParseException");
 		} catch (Exception e) {
-			CompassParseError error = (CompassParseError) e;
+			SegmentParseException error = (SegmentParseException) e;
 			Assert.assertEquals(index, error.getSegment().startCol);
 			Assert.assertEquals(message, error.getMessage());
 		}
@@ -26,31 +27,31 @@ public class CompassPlotParserTests {
 	private static void assertThrowsParseError(ExceptionRunnable r, int index, String message) {
 		try {
 			r.run();
-			Assert.fail("expected function to throw a CompassParseError");
+			Assert.fail("expected function to throw a SegmentParseException");
 		} catch (Exception e) {
-			CompassParseError error = (CompassParseError) e;
+			SegmentParseException error = (SegmentParseException) e;
 			Assert.assertEquals(index, error.getSegment().startCol);
 			Assert.assertEquals(message, error.getMessage());
 		}
 	}
 
-	private static DrawSurveyCommand parseDrawSurveyCommand(String command) throws CompassParseError {
+	private static DrawSurveyCommand parseDrawSurveyCommand(String command) throws SegmentParseException {
 		CompassPlotParser parser = new CompassPlotParser();
 		return parser.parseDrawSurveyCommand(parser(command));
 	}
 
-	private static FeatureCommand parseFeatureCommand(String command) throws CompassParseError {
+	private static FeatureCommand parseFeatureCommand(String command) throws SegmentParseException {
 		CompassPlotParser parser = new CompassPlotParser();
 		return parser.parseFeatureCommand(parser(command));
 	}
 
-	private static LineParser parser(String text) {
-		return new LineParser(new Segment(text, "", 0, 0));
+	private static SegmentParser parser(String text) {
+		return new SegmentParser(new Segment(text, "", 0, 0));
 	}
 
 	@Test
 	public void testInvalidParseDrawSurveyCommand() {
-		assertThrowsParseError(() -> parseDrawSurveyCommand("Q"), 0, "Invalid command: Q; expected D or M");
+		assertThrowsParseError(() -> parseDrawSurveyCommand("Q"), 0, "invalid command: Q");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D X"), 2, "invalid northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D128.2"), 1, "missing whitespace before northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D 128.2-65.9"), 7, "missing whitespace before easting");
@@ -75,7 +76,7 @@ public class CompassPlotParserTests {
 	}
 
 	@Test
-	public void testParseDrawSurveyCommand() throws CompassParseError {
+	public void testParseDrawSurveyCommand() throws SegmentParseException {
 		String line = "D   128.2   -65.9   -86.8  SZ7  P    0.0    3.0    1.0    2.0  I   21.8";
 		DrawSurveyCommand command = parseDrawSurveyCommand(line);
 		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
@@ -90,7 +91,7 @@ public class CompassPlotParserTests {
 	}
 
 	@Test
-	public void testParseDrawSurveyCommandErrors() throws CompassParseError {
+	public void testParseDrawSurveyCommandErrors() throws SegmentParseException {
 		CompassPlotParser parser = new CompassPlotParser();
 		String line = "D   128.2   -65.9   -86.8  SZ7  P    a0.0    b3.0    .    %2.0  I   21.8";
 		DrawSurveyCommand command = parser.parseDrawSurveyCommand(parser(line));
@@ -112,7 +113,7 @@ public class CompassPlotParserTests {
 	}
 
 	@Test
-	public void testParseFeatureCommand() throws CompassParseError {
+	public void testParseFeatureCommand() throws SegmentParseException {
 		String line = "L   128.2   -65.9   -86.8  SZ7  P    0.0    3.0    1.0    2.0  V   21.8";
 		FeatureCommand command = parseFeatureCommand(line);
 		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
@@ -127,7 +128,7 @@ public class CompassPlotParserTests {
 	}
 
 	@Test
-	public void testParseFeatureCommandErrors() throws CompassParseError {
+	public void testParseFeatureCommandErrors() throws SegmentParseException {
 		CompassPlotParser parser = new CompassPlotParser();
 		String line = "L   128.2   -65.9   -86.8  SZ7  P    a0.0    b3.0    .    %2.0  V   21.8";
 		FeatureCommand command = parser.parseFeatureCommand(parser(line));

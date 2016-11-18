@@ -6,7 +6,8 @@ import java.util.List;
 
 import org.andork.compass.CompassParseError;
 import org.andork.compass.CompassParseError.Severity;
-import org.andork.compass.LineParser;
+import org.andork.segment.SegmentParseException;
+import org.andork.segment.SegmentParser;
 
 public class CompassPlotParser {
 	private final List<CompassParseError> errors = new ArrayList<>();
@@ -15,20 +16,20 @@ public class CompassPlotParser {
 		return errors;
 	}
 
-	private BigDecimal lrudMeasurement(LineParser p, String name) {
+	private BigDecimal lrudMeasurement(SegmentParser p, String name) {
 		try {
 			BigDecimal value = p.bigDecimal("invalid " + name);
 			return value.compareTo(BigDecimal.ZERO) < 0 ? null : value;
-		} catch (CompassParseError e) {
-			errors.add(e);
+		} catch (SegmentParseException e) {
+			errors.add(new CompassParseError(e));
 			p.advanceToWhitespace();
 			return null;
 		}
 	}
 
-	public DrawSurveyCommand parseDrawSurveyCommand(LineParser p) throws CompassParseError {
+	public DrawSurveyCommand parseDrawSurveyCommand(SegmentParser p) throws SegmentParseException {
 		DrawOperation op;
-		switch (p.charAtIndex()) {
+		switch (p.character("missing command (M or D)")) {
 		case 'M':
 			op = DrawOperation.MOVE_TO;
 			break;
@@ -36,10 +37,9 @@ public class CompassPlotParser {
 			op = DrawOperation.LINE_TO;
 			break;
 		default:
-			p.throwError("Invalid command: " + p.charAtIndex() + "; expected D or M");
+			p.move(-1).throwError("invalid command: " + p.charAtIndex());
 			return null;
 		}
-		p.advance(1);
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
 		p.whitespace("missing whitespace before northing");
@@ -52,15 +52,13 @@ public class CompassPlotParser {
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
 			if (p.atEnd()) {
-				return command;
+				break;
 			}
-			switch (p.charAtIndex()) {
+			switch (p.character("expected command (S, P, or I)")) {
 			case 'S':
-				p.advance(1);
 				command.setStationName(p.nonwhitespace("missing station name").toString());
 				break;
 			case 'P':
-				p.advance(1);
 				p.whitespace("missing whitespace before left");
 				command.setLeft(lrudMeasurement(p, "left"));
 				p.whitespace("missing whitespace before right");
@@ -71,7 +69,6 @@ public class CompassPlotParser {
 				command.setDown(lrudMeasurement(p, "down"));
 				break;
 			case 'I':
-				p.advance(1);
 				p.whitespace("missing whitespace before distance from entrance");
 				int start = p.getIndex();
 				command.setDistanceFromEntrance(p.bigDecimal("invalid distance from entrance"));
@@ -82,14 +79,14 @@ public class CompassPlotParser {
 				}
 				break;
 			default:
-				p.throwError("unknown command: " + p.charAtIndex());
+				p.move(-1).throwError("unknown command: " + p.charAtIndex());
 			}
 		}
 
 		return command;
 	}
 
-	public FeatureCommand parseFeatureCommand(LineParser p) throws CompassParseError {
+	public FeatureCommand parseFeatureCommand(SegmentParser p) throws SegmentParseException {
 		p.character('L', "command should be L");
 		FeatureCommand command = new FeatureCommand();
 
@@ -105,13 +102,11 @@ public class CompassPlotParser {
 			if (p.atEnd()) {
 				return command;
 			}
-			switch (p.charAtIndex()) {
+			switch (p.character("expected command (S, P, or V)")) {
 			case 'S':
-				p.advance(1);
 				command.setStationName(p.nonwhitespace("missing station name").toString());
 				break;
 			case 'P':
-				p.advance(1);
 				p.whitespace("missing whitespace before left");
 				command.setLeft(lrudMeasurement(p, "left"));
 				p.whitespace("missing whitespace before right");
@@ -122,12 +117,11 @@ public class CompassPlotParser {
 				command.setDown(lrudMeasurement(p, "down"));
 				break;
 			case 'V':
-				p.advance(1);
 				p.whitespace("missing whitespace before value");
 				command.setValue(p.bigDecimal("invalid value"));
 				break;
 			default:
-				p.throwError("unknown command: " + p.charAtIndex());
+				p.move(-1).throwError("unknown command: " + p.charAtIndex());
 			}
 		}
 
