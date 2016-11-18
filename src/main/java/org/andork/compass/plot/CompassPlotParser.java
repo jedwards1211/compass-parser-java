@@ -29,9 +29,44 @@ public class CompassPlotParser {
 		}
 	}
 
+	public BeginSectionCommand parseBeginSectionCommand(SegmentParser p) throws SegmentParseException {
+		p.character('S', missingOrInvalid("command (expected S)"));
+		return new BeginSectionCommand(p.nonwhitespace(missingOrInvalid("section name")).toString());
+	}
+
+	public void parseBoundsCommand(SegmentParser p, BoundsCommand command) throws SegmentParseException {
+		p.whitespace("missing whitespace before min northing");
+		command.getLowerBound().setNorthing(p.bigDecimal(missingOrInvalid("min northing")));
+		p.whitespace("missing whitespace before max northing");
+		command.getUpperBound().setNorthing(p.bigDecimal(missingOrInvalid("max northing")));
+		p.whitespace("missing whitespace before min easting");
+		command.getLowerBound().setEasting(p.bigDecimal(missingOrInvalid("min easting")));
+		p.whitespace("missing whitespace before max easting");
+		command.getUpperBound().setEasting(p.bigDecimal(missingOrInvalid("max easting")));
+		p.whitespace("missing whitespace before min vertical");
+		command.getLowerBound().setVertical(p.bigDecimal(missingOrInvalid("min vertical")));
+		p.whitespace("missing whitespace before max vertical");
+		command.getUpperBound().setVertical(p.bigDecimal(missingOrInvalid("max vertical")));
+	}
+
+	public CompassPlotCommand parseCommand(SegmentParser p) throws SegmentParseException {
+		switch (p.character("missing command")) {
+		case 'D':
+		case 'M':
+			return parseDrawSurveyCommand(p.move(-1));
+		case 'S':
+			return parseBeginSectionCommand(p.move(-1));
+		case 'L':
+			return parseFeatureCommand(p.move(-1));
+		default:
+			throw new SegmentParseException("invalid command",
+					p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
+		}
+	}
+
 	public DrawSurveyCommand parseDrawSurveyCommand(SegmentParser p) throws SegmentParseException {
 		DrawOperation op;
-		switch (p.match("[MD]", missingOrInvalid("command (expected M or D)")).charAt(0)) {
+		switch (p.character("missing command (expected M or D)")) {
 		case 'M':
 			op = DrawOperation.MOVE_TO;
 			break;
@@ -39,7 +74,8 @@ public class CompassPlotParser {
 			op = DrawOperation.LINE_TO;
 			break;
 		default:
-			throw new RuntimeException("how can this happen");
+			throw new SegmentParseException("invalid command (expected M or D)",
+					p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
 		}
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
