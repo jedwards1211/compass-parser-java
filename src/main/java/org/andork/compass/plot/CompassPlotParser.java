@@ -37,7 +37,7 @@ public class CompassPlotParser {
 			op = DrawOperation.LINE_TO;
 			break;
 		default:
-			p.move(-1).throwError("invalid command: " + p.charAtIndex());
+			p.move(-1).throwException("invalid command: " + p.charAtIndex());
 			return null;
 		}
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
@@ -79,7 +79,7 @@ public class CompassPlotParser {
 				}
 				break;
 			default:
-				p.move(-1).throwError("unknown command: " + p.charAtIndex());
+				p.move(-1).throwException("unknown command: " + p.charAtIndex());
 			}
 		}
 
@@ -121,7 +121,7 @@ public class CompassPlotParser {
 				command.setValue(p.bigDecimal("invalid value"));
 				break;
 			default:
-				p.move(-1).throwError("unknown command: " + p.charAtIndex());
+				p.move(-1).throwException("unknown command: " + p.charAtIndex());
 			}
 		}
 
