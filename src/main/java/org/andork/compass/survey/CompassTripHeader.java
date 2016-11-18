@@ -1,5 +1,6 @@
 package org.andork.compass.survey;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.andork.compass.AzimuthUnit;
@@ -37,7 +38,7 @@ public class CompassTripHeader {
 	/**
 	 * Magnetic declination, in degrees
 	 */
-	private double declination = 0;
+	private BigDecimal declination = BigDecimal.ZERO;
 	/**
 	 * Display for shot lengths
 	 */
@@ -78,37 +79,37 @@ public class CompassTripHeader {
 	/**
 	 * Correction added to the length of each shot in this trip, in feet.
 	 */
-	private double lengthCorrection = 0;
+	private BigDecimal lengthCorrection = BigDecimal.ZERO;
 	/**
 	 * Correction added to the frontsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private double frontsightAzimuthCorrection = 0;
+	private BigDecimal frontsightAzimuthCorrection = BigDecimal.ZERO;
 	/**
 	 * Correction added to the frontsight inclination of each shot in this trip,
 	 * in degrees.
 	 */
-	private double frontsightInclinationCorrection = 0;
+	private BigDecimal frontsightInclinationCorrection = BigDecimal.ZERO;
 	/**
 	 * Correction added to the backsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private double backsightAzimuthCorrection = 0;
+	private BigDecimal backsightAzimuthCorrection = BigDecimal.ZERO;
 	/**
 	 * Correction added to the backsight inclination of each shot in this trip,
 	 * in degrees.
 	 */
-	private double backsightInclinationCorrection = 0;
+	private BigDecimal backsightInclinationCorrection = BigDecimal.ZERO;
 
 	public AzimuthUnit getAzimuthUnit() {
 		return azimuthUnit;
 	}
 
-	public double getBacksightAzimuthCorrection() {
+	public BigDecimal getBacksightAzimuthCorrection() {
 		return backsightAzimuthCorrection;
 	}
 
-	public double getBacksightInclinationCorrection() {
+	public BigDecimal getBacksightInclinationCorrection() {
 		return backsightInclinationCorrection;
 	}
 
@@ -124,15 +125,15 @@ public class CompassTripHeader {
 		return date;
 	}
 
-	public double getDeclination() {
+	public BigDecimal getDeclination() {
 		return declination;
 	}
 
-	public double getFrontsightAzimuthCorrection() {
+	public BigDecimal getFrontsightAzimuthCorrection() {
 		return frontsightAzimuthCorrection;
 	}
 
-	public double getFrontsightInclinationCorrection() {
+	public BigDecimal getFrontsightInclinationCorrection() {
 		return frontsightInclinationCorrection;
 	}
 
@@ -140,7 +141,7 @@ public class CompassTripHeader {
 		return inclinationUnit;
 	}
 
-	public double getLengthCorrection() {
+	public BigDecimal getLengthCorrection() {
 		return lengthCorrection;
 	}
 
@@ -180,11 +181,11 @@ public class CompassTripHeader {
 		this.azimuthUnit = azimuthUnit;
 	}
 
-	public void setBacksightAzimuthCorrection(double backsightAzimuthCorrection) {
+	public void setBacksightAzimuthCorrection(BigDecimal backsightAzimuthCorrection) {
 		this.backsightAzimuthCorrection = backsightAzimuthCorrection;
 	}
 
-	public void setBacksightInclinationCorrection(double backsightInclinationCorrection) {
+	public void setBacksightInclinationCorrection(BigDecimal backsightInclinationCorrection) {
 		this.backsightInclinationCorrection = backsightInclinationCorrection;
 	}
 
@@ -200,15 +201,15 @@ public class CompassTripHeader {
 		this.date = date;
 	}
 
-	public void setDeclination(double declination) {
+	public void setDeclination(BigDecimal declination) {
 		this.declination = declination;
 	}
 
-	public void setFrontsightAzimuthCorrection(double frontsightAzimuthCorrection) {
+	public void setFrontsightAzimuthCorrection(BigDecimal frontsightAzimuthCorrection) {
 		this.frontsightAzimuthCorrection = frontsightAzimuthCorrection;
 	}
 
-	public void setFrontsightInclinationCorrection(double frontsightInclinationCorrection) {
+	public void setFrontsightInclinationCorrection(BigDecimal frontsightInclinationCorrection) {
 		this.frontsightInclinationCorrection = frontsightInclinationCorrection;
 	}
 
@@ -220,7 +221,7 @@ public class CompassTripHeader {
 		this.inclinationUnit = inclinationUnit;
 	}
 
-	public void setLengthCorrection(double lengthCorrection) {
+	public void setLengthCorrection(BigDecimal lengthCorrection) {
 		this.lengthCorrection = lengthCorrection;
 	}
 

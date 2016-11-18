@@ -1,5 +1,6 @@
 package org.andork.compass;
 
+import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
 import org.andork.compass.CompassParseError.Severity;
@@ -34,6 +35,15 @@ public class LineParser {
 		return index >= segment.length();
 	}
 
+	public BigDecimal bigDecimal(String errorMessage) throws CompassParseError {
+		Segment segment = pattern(DOUBLE_LITERAL, errorMessage).group();
+		try {
+			return new BigDecimal(segment.toString());
+		} catch (Exception ex) {
+			throw new CompassParseError(Severity.ERROR, errorMessage, segment);
+		}
+	}
+
 	public void character(char c, String errorMessage) throws CompassParseError {
 		if (index >= segment.length() || segment.charAt(index) != c) {
 			throw new CompassParseError(Severity.ERROR, errorMessage,
@@ -44,15 +54,6 @@ public class LineParser {
 
 	public char charAtIndex() {
 		return segment.charAt(index);
-	}
-
-	public double doubleLiteral(String errorMessage) throws CompassParseError {
-		Segment segment = pattern(DOUBLE_LITERAL, errorMessage).group();
-		try {
-			return Double.parseDouble(segment.toString());
-		} catch (Exception ex) {
-			throw new CompassParseError(Severity.ERROR, errorMessage, segment);
-		}
 	}
 
 	public int getIndex() {

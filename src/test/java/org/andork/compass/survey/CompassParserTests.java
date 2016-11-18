@@ -6,22 +6,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.andork.compass.AzimuthUnit;
 import org.andork.compass.CompassParseError;
+import org.andork.compass.CompassParseError.Severity;
 import org.andork.compass.InclinationUnit;
 import org.andork.compass.LengthUnit;
 import org.andork.compass.LrudAssociation;
 import org.andork.compass.LrudItem;
-import org.andork.compass.CompassParseError.Severity;
-import org.andork.compass.survey.CompassSurveyParser;
-import org.andork.compass.survey.CompassShot;
-import org.andork.compass.survey.CompassTrip;
-import org.andork.compass.survey.CompassTripHeader;
-import org.andork.compass.survey.ShotItem;
 import org.andork.segment.Segment;
 import org.junit.Test;
 
@@ -143,11 +139,11 @@ public class CompassParserTests {
 		assertEquals(parser.getErrors().size(), 2);
 		assertTrue(parser.getErrors().stream().anyMatch(error -> error.equals(new CompassParseError(
 				Severity.ERROR,
-				"frontsight inclination must be between -90.0 and 90.0",
+				"frontsight inclination must be between -90 and 90",
 				extract(segment, "-91.00")))));
 		assertTrue(parser.getErrors().stream().anyMatch(error -> error.equals(new CompassParseError(
 				Severity.ERROR,
-				"backsight inclination must be between -90.0 and 90.0",
+				"backsight inclination must be between -90 and 90",
 				extract(segment, "92.0")))));
 	}
 
@@ -164,7 +160,7 @@ public class CompassParserTests {
 		assertEquals(1, parser.getErrors().size());
 		assertTrue(parser.getErrors().stream().anyMatch(error -> error.equals(new CompassParseError(
 				Severity.ERROR,
-				"length must be >= 0.0",
+				"length must be >= 0",
 				extract(segment, "-4.25")))));
 	}
 
@@ -257,13 +253,13 @@ public class CompassParserTests {
 				.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50", "test.txt", 0, 0), header);
 		assertEquals(shot.getFromStationName(), "A3");
 		assertEquals(shot.getToStationName(), "A4");
-		assertEquals(shot.getLength(), 4.25, 0.0);
-		assertEquals(shot.getFrontsightAzimuth(), 15.0, 0.0);
-		assertEquals(shot.getFrontsightInclination(), -85.0, 0.0);
-		assertEquals(shot.getLeft(), 5.0, 0.0);
-		assertEquals(shot.getUp(), 3.5, 0.0);
-		assertEquals(shot.getDown(), 0.75, 0.0);
-		assertEquals(shot.getRight(), 0.5, 0.0);
+		assertEquals(new BigDecimal("4.25"), shot.getLength());
+		assertEquals(new BigDecimal("15.00"), shot.getFrontsightAzimuth());
+		assertEquals(new BigDecimal("-85.00"), shot.getFrontsightInclination());
+		assertEquals(new BigDecimal("5.00"), shot.getLeft());
+		assertEquals(new BigDecimal("3.50"), shot.getUp());
+		assertEquals(new BigDecimal("0.75"), shot.getDown());
+		assertEquals(new BigDecimal("0.50"), shot.getRight());
 		assertFalse(shot.isExcludedFromLength());
 		assertFalse(shot.isExcludedFromPlotting());
 		assertFalse(shot.isExcludedFromAllProcessing());
@@ -313,7 +309,7 @@ public class CompassParserTests {
 		assertEquals("SECRET CAVE", trip2.getHeader().getCaveName());
 		assertEquals(new Date(79, 6, 10), trip2.getHeader().getDate());
 		assertEquals("D.SMITH,R.BROWN,S.MURRAY", trip2.getHeader().getTeam());
-		assertEquals(1.0, trip2.getHeader().getDeclination(), 0.0);
+		assertEquals(new BigDecimal("1.00"), trip2.getHeader().getDeclination());
 		assertEquals(trip2.getHeader().getAzimuthUnit(), AzimuthUnit.DEGREES);
 		assertEquals(trip2.getHeader().getLengthUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(trip2.getHeader().getLrudUnit(), LengthUnit.DECIMAL_FEET);
@@ -335,13 +331,13 @@ public class CompassParserTests {
 		shot = trip2.getShots().get(0);
 		assertEquals("B2", shot.getFromStationName());
 		assertEquals("B1", shot.getToStationName());
-		assertEquals(13.0, shot.getLength(), 0.0);
-		assertEquals(35.0, shot.getFrontsightAzimuth(), 0.0);
-		assertEquals(15.0, shot.getFrontsightInclination(), 0.0);
-		assertEquals(0.0, shot.getLeft(), 0.0);
-		assertEquals(2.0, shot.getUp(), 0.0);
-		assertEquals(1.5, shot.getDown(), 0.0);
-		assertEquals(1.0, shot.getRight(), 0.0);
+		assertEquals(new BigDecimal("13.0"), shot.getLength());
+		assertEquals(new BigDecimal("35.0"), shot.getFrontsightAzimuth());
+		assertEquals(new BigDecimal("15.0"), shot.getFrontsightInclination());
+		assertEquals(new BigDecimal("0.0"), shot.getLeft());
+		assertEquals(new BigDecimal("2.0"), shot.getUp());
+		assertEquals(new BigDecimal("1.5"), shot.getDown());
+		assertEquals(new BigDecimal("1.0"), shot.getRight());
 
 		assertEquals(parser.getErrors().size(), 0);
 	}
@@ -361,7 +357,7 @@ public class CompassParserTests {
 		assertEquals(header.getSurveyName(), "A");
 		assertEquals(header.getDate(), new Date(79, 6, 10));
 		assertEquals(header.getTeam(), "D.SMITH,R.BROWN,S.MURRAY");
-		assertEquals(header.getDeclination(), 1.0, 0.0);
+		assertEquals(new BigDecimal("1.00"), header.getDeclination());
 		assertEquals(header.getAzimuthUnit(), AzimuthUnit.DEGREES);
 		assertEquals(header.getLengthUnit(), LengthUnit.DECIMAL_FEET);
 		assertEquals(header.getLrudUnit(), LengthUnit.DECIMAL_FEET);
@@ -393,15 +389,15 @@ public class CompassParserTests {
 						header);
 		assertEquals(shot.getFromStationName(), "A3");
 		assertEquals(shot.getToStationName(), "A4");
-		assertEquals(shot.getLength(), 4.25, 0.0);
-		assertEquals(shot.getFrontsightAzimuth(), 15.0, 0.0);
-		assertEquals(shot.getFrontsightInclination(), -85.0, 0.0);
-		assertEquals(shot.getLeft(), 5.0, 0.0);
-		assertEquals(shot.getUp(), 3.5, 0.0);
-		assertEquals(shot.getDown(), 0.75, 0.0);
-		assertEquals(shot.getRight(), 0.5, 0.0);
-		assertEquals(shot.getBacksightAzimuth(), 195.0, 0.0);
-		assertEquals(shot.getBacksightInclination(), 85.0, 0.0);
+		assertEquals(shot.getLength(), new BigDecimal(4.25));
+		assertEquals(new BigDecimal("15.00"), shot.getFrontsightAzimuth());
+		assertEquals(new BigDecimal("-85.00"), shot.getFrontsightInclination());
+		assertEquals(new BigDecimal("5.00"), shot.getLeft());
+		assertEquals(new BigDecimal("3.50"), shot.getUp());
+		assertEquals(new BigDecimal("0.75"), shot.getDown());
+		assertEquals(new BigDecimal("0.50"), shot.getRight());
+		assertEquals(new BigDecimal("195.0"), shot.getBacksightAzimuth());
+		assertEquals(new BigDecimal("85.00"), shot.getBacksightInclination());
 		assertFalse(shot.isExcludedFromLength());
 		assertFalse(shot.isExcludedFromPlotting());
 		assertFalse(shot.isExcludedFromAllProcessing());

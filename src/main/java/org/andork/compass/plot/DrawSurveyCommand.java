@@ -1,16 +1,17 @@
 package org.andork.compass.plot;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class DrawSurveyCommand implements LocationCommand {
 	private DrawOperation operation;
 	private final Location location = new Location();
 	private String stationName;
-	private double left = Double.NaN;
-	private double right = Double.NaN;
-	private double up = Double.NaN;
-	private double down = Double.NaN;
-	private double distanceFromEntrance = 0;
+	private BigDecimal left = null;
+	private BigDecimal right = null;
+	private BigDecimal up = null;
+	private BigDecimal down = null;
+	private BigDecimal distanceFromEntrance = BigDecimal.ZERO;
 
 	public DrawSurveyCommand(DrawOperation operation) {
 		operation = Objects.requireNonNull(operation);
@@ -19,17 +20,17 @@ public class DrawSurveyCommand implements LocationCommand {
 	/**
 	 * @return the distance from the entrance to the station
 	 */
-	public double getDistanceFromEntrance() {
+	public BigDecimal getDistanceFromEntrance() {
 		return distanceFromEntrance;
 	}
 
 	@Override
-	public double getDown() {
+	public BigDecimal getDown() {
 		return down;
 	}
 
 	@Override
-	public double getLeft() {
+	public BigDecimal getLeft() {
 		return left;
 	}
 
@@ -43,7 +44,7 @@ public class DrawSurveyCommand implements LocationCommand {
 	}
 
 	@Override
-	public double getRight() {
+	public BigDecimal getRight() {
 		return right;
 	}
 
@@ -53,21 +54,21 @@ public class DrawSurveyCommand implements LocationCommand {
 	}
 
 	@Override
-	public double getUp() {
+	public BigDecimal getUp() {
 		return up;
 	}
 
-	public void setDistanceFromEntrance(double distanceFromEntrance) {
+	public void setDistanceFromEntrance(BigDecimal distanceFromEntrance) {
 		this.distanceFromEntrance = distanceFromEntrance;
 	}
 
 	@Override
-	public void setDown(double down) {
+	public void setDown(BigDecimal down) {
 		this.down = down;
 	}
 
 	@Override
-	public void setLeft(double left) {
+	public void setLeft(BigDecimal left) {
 		this.left = left;
 	}
 
@@ -76,7 +77,7 @@ public class DrawSurveyCommand implements LocationCommand {
 	}
 
 	@Override
-	public void setRight(double right) {
+	public void setRight(BigDecimal right) {
 		this.right = right;
 	}
 
@@ -86,7 +87,7 @@ public class DrawSurveyCommand implements LocationCommand {
 	}
 
 	@Override
-	public void setUp(double up) {
+	public void setUp(BigDecimal up) {
 		this.up = up;
 	}
 }

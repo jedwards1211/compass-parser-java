@@ -1,5 +1,6 @@
 package org.andork.compass.plot;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +15,14 @@ public class CompassPlotParser {
 		return errors;
 	}
 
-	private double lrudMeasurement(LineParser p, String name) {
+	private BigDecimal lrudMeasurement(LineParser p, String name) {
 		try {
-			double value = p.doubleLiteral("invalid " + name);
-			return value < 0 ? Double.NaN : value;
+			BigDecimal value = p.bigDecimal("invalid " + name);
+			return value.compareTo(BigDecimal.ZERO) < 0 ? null : value;
 		} catch (CompassParseError e) {
 			errors.add(e);
 			p.advanceToWhitespace();
-			return Double.NaN;
+			return null;
 		}
 	}
 
@@ -42,11 +43,11 @@ public class CompassPlotParser {
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.doubleLiteral("invalid northing"));
+		command.getLocation().setNorthing(p.bigDecimal("invalid northing"));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.doubleLiteral("invalid easting"));
+		command.getLocation().setEasting(p.bigDecimal("invalid easting"));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.doubleLiteral("invalid vertical"));
+		command.getLocation().setVertical(p.bigDecimal("invalid vertical"));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
@@ -73,8 +74,8 @@ public class CompassPlotParser {
 				p.advance(1);
 				p.whitespace("missing whitespace before distance from entrance");
 				int start = p.getIndex();
-				command.setDistanceFromEntrance(p.doubleLiteral("invalid distance from entrance"));
-				if (command.getDistanceFromEntrance() < 0) {
+				command.setDistanceFromEntrance(p.bigDecimal("invalid distance from entrance"));
+				if (command.getDistanceFromEntrance().compareTo(BigDecimal.ZERO) < 0) {
 					errors.add(new CompassParseError(
 							Severity.WARNING, "distance from entrance is negative",
 							p.getSegment().substring(start, p.getIndex())));
@@ -93,11 +94,11 @@ public class CompassPlotParser {
 		FeatureCommand command = new FeatureCommand();
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.doubleLiteral("invalid northing"));
+		command.getLocation().setNorthing(p.bigDecimal("invalid northing"));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.doubleLiteral("invalid easting"));
+		command.getLocation().setEasting(p.bigDecimal("invalid easting"));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.doubleLiteral("invalid vertical"));
+		command.getLocation().setVertical(p.bigDecimal("invalid vertical"));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
@@ -123,7 +124,7 @@ public class CompassPlotParser {
 			case 'V':
 				p.advance(1);
 				p.whitespace("missing whitespace before value");
-				command.setValue(p.doubleLiteral("invalid value"));
+				command.setValue(p.bigDecimal("invalid value"));
 				break;
 			default:
 				p.throwError("unknown command: " + p.charAtIndex());

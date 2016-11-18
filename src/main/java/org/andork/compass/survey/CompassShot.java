@@ -1,9 +1,11 @@
 package org.andork.compass.survey;
 
+import java.math.BigDecimal;
+
 /**
  * Data for a shot between two stations.
  *
- * All <code>double</code> fields may be <code>NaN</code>, indicating the
+ * All <code>BigDecimal</code> fields may be <code>NaN</code>, indicating the
  * measurement is missing (in the case of length, azimuth, or inclination) or
  * passage (in the case of LRUDs).
  */
@@ -19,45 +21,45 @@ public class CompassShot {
 	/**
 	 * Distance between the two stations, in feet
 	 */
-	private double length = Double.NaN;
+	private BigDecimal length = null;
 	/**
 	 * Compass bearing toward to station at from station, in degrees
 	 */
-	private double frontsightAzimuth = Double.NaN;
+	private BigDecimal frontsightAzimuth = null;
 	/**
 	 * Vertical angle toward to station at from station, in degrees
 	 */
-	private double frontsightInclination = Double.NaN;
+	private BigDecimal frontsightInclination = null;
 	/**
 	 * Compass bearing toward from station at to station, in degrees
 	 */
-	private double backsightAzimuth = Double.NaN;
+	private BigDecimal backsightAzimuth = null;
 	/**
 	 * Vertical angle toward from station at to station, in degrees
 	 */
-	private double backsightInclination = Double.NaN;
+	private BigDecimal backsightInclination = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private double left = Double.NaN;
+	private BigDecimal left = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private double right = Double.NaN;
+	private BigDecimal right = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the ceiling.
 	 */
-	private double up = Double.NaN;
+	private BigDecimal up = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the floor.
 	 */
-	private double down = Double.NaN;
+	private BigDecimal down = null;
 	/**
 	 * Arbitrary user comment for this shot
 	 */
@@ -81,6 +83,54 @@ public class CompassShot {
 	 */
 	private boolean doNotAdjust = false;
 
+	public BigDecimal getBacksightAzimuth() {
+		return backsightAzimuth;
+	}
+
+	public BigDecimal getBacksightInclination() {
+		return backsightInclination;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public BigDecimal getDown() {
+		return down;
+	}
+
+	public String getFromStationName() {
+		return fromStationName;
+	}
+
+	public BigDecimal getFrontsightAzimuth() {
+		return frontsightAzimuth;
+	}
+
+	public BigDecimal getFrontsightInclination() {
+		return frontsightInclination;
+	}
+
+	public BigDecimal getLeft() {
+		return left;
+	}
+
+	public BigDecimal getLength() {
+		return length;
+	}
+
+	public BigDecimal getRight() {
+		return right;
+	}
+
+	public String getToStationName() {
+		return toStationName;
+	}
+
+	public BigDecimal getUp() {
+		return up;
+	}
+
 	public boolean isDoNotAdjust() {
 		return doNotAdjust;
 	}
@@ -97,59 +147,11 @@ public class CompassShot {
 		return excludedFromPlotting;
 	}
 
-	public double getBacksightAzimuth() {
-		return backsightAzimuth;
-	}
-
-	public double getBacksightInclination() {
-		return backsightInclination;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public double getDown() {
-		return down;
-	}
-
-	public String getFromStationName() {
-		return fromStationName;
-	}
-
-	public double getFrontsightAzimuth() {
-		return frontsightAzimuth;
-	}
-
-	public double getFrontsightInclination() {
-		return frontsightInclination;
-	}
-
-	public double getLeft() {
-		return left;
-	}
-
-	public double getLength() {
-		return length;
-	}
-
-	public double getRight() {
-		return right;
-	}
-
-	public String getToStationName() {
-		return toStationName;
-	}
-
-	public double getUp() {
-		return up;
-	}
-
-	public void setBacksightAzimuth(double backsightAzimuth) {
+	public void setBacksightAzimuth(BigDecimal backsightAzimuth) {
 		this.backsightAzimuth = backsightAzimuth;
 	}
 
-	public void setBacksightInclination(double backsightInclination) {
+	public void setBacksightInclination(BigDecimal backsightInclination) {
 		this.backsightInclination = backsightInclination;
 	}
 
@@ -161,43 +163,43 @@ public class CompassShot {
 		this.doNotAdjust = doNotAdjust;
 	}
 
-	public void setDown(double down) {
+	public void setDown(BigDecimal down) {
 		this.down = down;
 	}
 
 	public void setExcludedFromAllProcessing(boolean excludeFromAllProcessing) {
-		this.excludedFromAllProcessing = excludeFromAllProcessing;
+		excludedFromAllProcessing = excludeFromAllProcessing;
 	}
 
 	public void setExcludedFromLength(boolean excludeFromLength) {
-		this.excludedFromLength = excludeFromLength;
+		excludedFromLength = excludeFromLength;
 	}
 
 	public void setExcludedFromPlotting(boolean excludeFromPlotting) {
-		this.excludedFromPlotting = excludeFromPlotting;
+		excludedFromPlotting = excludeFromPlotting;
 	}
 
 	public void setFromStationName(String fromStationName) {
 		this.fromStationName = fromStationName;
 	}
 
-	public void setFrontsightAzimuth(double frontsightAzimuth) {
+	public void setFrontsightAzimuth(BigDecimal frontsightAzimuth) {
 		this.frontsightAzimuth = frontsightAzimuth;
 	}
 
-	public void setFrontsightInclination(double frontsightInclination) {
+	public void setFrontsightInclination(BigDecimal frontsightInclination) {
 		this.frontsightInclination = frontsightInclination;
 	}
 
-	public void setLeft(double left) {
+	public void setLeft(BigDecimal left) {
 		this.left = left;
 	}
 
-	public void setLength(double length) {
+	public void setLength(BigDecimal length) {
 		this.length = length;
 	}
 
-	public void setRight(double right) {
+	public void setRight(BigDecimal right) {
 		this.right = right;
 	}
 
@@ -205,7 +207,7 @@ public class CompassShot {
 		this.toStationName = toStationName;
 	}
 
-	public void setUp(double up) {
+	public void setUp(BigDecimal up) {
 		this.up = up;
 	}
 

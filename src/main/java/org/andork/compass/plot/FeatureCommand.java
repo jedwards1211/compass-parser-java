@@ -1,21 +1,23 @@
 package org.andork.compass.plot;
 
+import java.math.BigDecimal;
+
 public class FeatureCommand implements LocationCommand {
 	private final Location location = new Location();
 	private String stationName;
-	private double left = Double.NaN;
-	private double right = Double.NaN;
-	private double up = Double.NaN;
-	private double down = Double.NaN;
-	private double value = Double.NaN;
+	private BigDecimal left = null;
+	private BigDecimal right = null;
+	private BigDecimal up = null;
+	private BigDecimal down = null;
+	private BigDecimal value = null;
 
 	@Override
-	public double getDown() {
+	public BigDecimal getDown() {
 		return down;
 	}
 
 	@Override
-	public double getLeft() {
+	public BigDecimal getLeft() {
 		return left;
 	}
 
@@ -25,7 +27,7 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public double getRight() {
+	public BigDecimal getRight() {
 		return right;
 	}
 
@@ -35,29 +37,29 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public double getUp() {
+	public BigDecimal getUp() {
 		return up;
 	}
 
 	/**
 	 * @return the value associated with this feature, or NaN if missing
 	 */
-	public double getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
 
 	@Override
-	public void setDown(double down) {
+	public void setDown(BigDecimal down) {
 		this.down = down;
 	}
 
 	@Override
-	public void setLeft(double left) {
+	public void setLeft(BigDecimal left) {
 		this.left = left;
 	}
 
 	@Override
-	public void setRight(double right) {
+	public void setRight(BigDecimal right) {
 		this.right = right;
 	}
 
@@ -67,11 +69,11 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public void setUp(double up) {
+	public void setUp(BigDecimal up) {
 		this.up = up;
 	}
 
-	public void setValue(double value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 }

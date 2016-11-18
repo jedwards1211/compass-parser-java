@@ -2,6 +2,7 @@ package org.andork.compass.survey;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,11 +17,11 @@ import java.util.regex.Pattern;
 
 import org.andork.compass.AzimuthUnit;
 import org.andork.compass.CompassParseError;
+import org.andork.compass.CompassParseError.Severity;
 import org.andork.compass.InclinationUnit;
 import org.andork.compass.LengthUnit;
 import org.andork.compass.LrudAssociation;
 import org.andork.compass.LrudItem;
-import org.andork.compass.CompassParseError.Severity;
 import org.andork.segment.Segment;
 import org.andork.segment.SegmentMatcher;
 
@@ -33,9 +34,14 @@ public class CompassSurveyParser {
 			"SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:",
 			Pattern.CASE_INSENSITIVE);
 
+	private static final BigDecimal POS_90 = new BigDecimal(90);
+
+	private static final BigDecimal NEG_90 = new BigDecimal(-90);
+
 	public static void main(String[] args) {
 		if (args.length == 0) {
-			System.out.println("Usage: java " + CompassSurveyParser.class.getName() + " <compass file> [<compass files...>]");
+			System.out.println(
+					"Usage: java " + CompassSurveyParser.class.getName() + " <compass file> [<compass files...>]");
 			return;
 		}
 
@@ -100,9 +106,12 @@ public class CompassSurveyParser {
 		iteratee.accept(lastMatch, matcher.segment().substring(lastEnd).trim());
 	}
 
-	double parseAzimuth(SegmentMatcher matcher, String fieldName) {
-		double measurement = parseMeasurement(matcher, fieldName);
-		if (measurement < 0 || measurement >= 360) {
+	BigDecimal parseAzimuth(SegmentMatcher matcher, String fieldName) {
+		BigDecimal measurement = parseMeasurement(matcher, fieldName);
+		if (measurement == null) {
+			return null;
+		}
+		if (measurement.compareTo(BigDecimal.ZERO) < 0 || measurement.compareTo(new BigDecimal(360)) >= 0) {
 			addError(fieldName + " must be >= 0 and < 360", matcher.group());
 		}
 		return measurement;
@@ -258,57 +267,63 @@ public class CompassSurveyParser {
 		}
 	}
 
-	double parseLrudMeasurement(SegmentMatcher matcher, String fieldName) {
+	BigDecimal parseLrudMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.group().substring(matcher.regionEnd()));
-			return Double.NaN;
+			return null;
 		}
-		double value;
+		BigDecimal value;
 		try {
-			value = Double.parseDouble(matcher.group().toString());
+			value = new BigDecimal(matcher.group().toString());
 		} catch (NumberFormatException ex) {
 			addError("missing " + fieldName, matcher.group());
-			return Double.NaN;
+			return null;
 		}
-		if (value < -1 || value > 990) {
-			return Double.NaN;
+		if (value.compareTo(new BigDecimal(-1)) < 0 || value.compareTo(new BigDecimal(990)) > 0) {
+			return null;
 		}
 		// Compass barfs on LRUDs between -1 and 0
-		if (value < 0) {
+		if (value.compareTo(BigDecimal.ZERO) < 0) {
 			addError(fieldName + " must be >= 0.0", matcher.group());
 		}
 		return value;
 	}
 
-	double parseMeasurement(SegmentMatcher matcher, String fieldName) {
+	BigDecimal parseMeasurement(SegmentMatcher matcher, String fieldName) {
 		if (!matcher.find()) {
 			addError("missing " + fieldName, matcher.segment().substring(matcher.regionEnd()));
-			return Double.NaN;
+			return null;
 		}
-		double value;
+		BigDecimal value;
 		try {
-			value = Double.parseDouble(matcher.group().toString());
+			value = new BigDecimal(matcher.group().toString());
 		} catch (NumberFormatException ex) {
 			addError("missing " + fieldName, matcher.group());
-			return Double.NaN;
+			return null;
 		}
-		if (value < -990 || value > 990) {
-			return Double.NaN;
+		if (value.abs().compareTo(new BigDecimal(990)) > 0) {
+			return null;
 		}
 		return value;
 	}
 
-	double parseMeasurement(SegmentMatcher matcher, String fieldName, double min) {
-		double measurement = parseMeasurement(matcher, fieldName);
-		if (measurement < min) {
+	BigDecimal parseMeasurement(SegmentMatcher matcher, String fieldName, BigDecimal min) {
+		BigDecimal measurement = parseMeasurement(matcher, fieldName);
+		if (measurement == null) {
+			return null;
+		}
+		if (measurement.compareTo(min) < 0) {
 			addError(fieldName + " must be >= " + min, matcher.group());
 		}
 		return measurement;
 	}
 
-	double parseMeasurement(SegmentMatcher matcher, String fieldName, double min, double max) {
-		double measurement = parseMeasurement(matcher, fieldName);
-		if (measurement < min || measurement > max) {
+	BigDecimal parseMeasurement(SegmentMatcher matcher, String fieldName, BigDecimal min, BigDecimal max) {
+		BigDecimal measurement = parseMeasurement(matcher, fieldName);
+		if (measurement == null) {
+			return null;
+		}
+		if (measurement.compareTo(min) < 0 || measurement.compareTo(max) > 0) {
 			addError(fieldName + " must be between " + min + " and " + max, matcher.group());
 		}
 		return measurement;
@@ -330,20 +345,20 @@ public class CompassSurveyParser {
 		final CompassShot shot = new CompassShot();
 		shot.setFromStationName(parseString(matcher, "from station name"));
 		shot.setToStationName(parseString(matcher, "to station name"));
-		shot.setLength(parseMeasurement(matcher, "length", 0));
-		if (Double.isNaN(shot.getLength()) && matcher.hitEnd()) {
+		shot.setLength(parseMeasurement(matcher, "length", BigDecimal.ZERO));
+		if (shot.getLength() == null && matcher.hitEnd()) {
 			return null;
 		}
 
 		shot.setFrontsightAzimuth(parseAzimuth(matcher, "frontsight azimuth"));
-		shot.setFrontsightInclination(parseMeasurement(matcher, "frontsight inclination", -90, 90));
+		shot.setFrontsightInclination(parseMeasurement(matcher, "frontsight inclination", NEG_90, POS_90));
 		shot.setLeft(parseLrudMeasurement(matcher, "left"));
 		shot.setUp(parseLrudMeasurement(matcher, "up"));
 		shot.setDown(parseLrudMeasurement(matcher, "down"));
 		shot.setRight(parseLrudMeasurement(matcher, "right"));
 		if (tripHeader.hasBacksights()) {
 			shot.setBacksightAzimuth(parseAzimuth(matcher, "backsight azimuth"));
-			shot.setBacksightInclination(parseMeasurement(matcher, "backsight inclination", -90, 90));
+			shot.setBacksightInclination(parseMeasurement(matcher, "backsight inclination", NEG_90, POS_90));
 		}
 		if (matcher.hitEnd()) {
 			return shot;

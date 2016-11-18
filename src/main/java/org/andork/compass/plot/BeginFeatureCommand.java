@@ -1,9 +1,11 @@
 package org.andork.compass.plot;
 
+import java.math.BigDecimal;
+
 public class BeginFeatureCommand implements CompassPlotCommand {
 	private String featureName;
-	private double minValue = Double.NaN;
-	private double maxValue = Double.NaN;
+	private BigDecimal minValue = null;
+	private BigDecimal maxValue = null;
 
 	public String getFeatureName() {
 		return featureName;
@@ -12,14 +14,14 @@ public class BeginFeatureCommand implements CompassPlotCommand {
 	/**
 	 * @return the max value for this feature, or NaN if not specified
 	 */
-	public double getMaxValue() {
+	public BigDecimal getMaxValue() {
 		return maxValue;
 	}
 
 	/**
 	 * @return the min value for this feature, or NaN if not specified
 	 */
-	public double getMinValue() {
+	public BigDecimal getMinValue() {
 		return minValue;
 	}
 
@@ -27,11 +29,11 @@ public class BeginFeatureCommand implements CompassPlotCommand {
 		this.featureName = featureName;
 	}
 
-	public void setMaxValue(double maxValue) {
+	public void setMaxValue(BigDecimal maxValue) {
 		this.maxValue = maxValue;
 	}
 
-	public void setMinValue(double minValue) {
+	public void setMinValue(BigDecimal minValue) {
 		this.minValue = minValue;
 	}
 }

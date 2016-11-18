@@ -1,15 +1,18 @@
 package org.andork.compass.plot;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 public class Location {
-	private double northing;
-	private double easting;
-	private double vertical;
+	private BigDecimal northing;
+	private BigDecimal easting;
+	private BigDecimal vertical;
 
 	public Location() {
-		this(0, 0, 0);
+		this(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 	}
 
-	public Location(double northing, double easting, double vertical) {
+	public Location(BigDecimal northing, BigDecimal easting, BigDecimal vertical) {
 		this.northing = northing;
 		this.easting = easting;
 		this.vertical = vertical;
@@ -27,33 +30,39 @@ public class Location {
 			return false;
 		}
 		Location other = (Location) obj;
-		if (Double.doubleToLongBits(easting) != Double.doubleToLongBits(other.easting)) {
+		if (easting == null) {
+			if (other.easting != null) {
+				return false;
+			}
+		} else if (!easting.equals(other.easting)) {
 			return false;
 		}
-		if (Double.doubleToLongBits(northing) != Double.doubleToLongBits(other.northing)) {
+		if (northing == null) {
+			if (other.northing != null) {
+				return false;
+			}
+		} else if (!northing.equals(other.northing)) {
 			return false;
 		}
-		if (Double.doubleToLongBits(vertical) != Double.doubleToLongBits(other.vertical)) {
+		if (vertical == null) {
+			if (other.vertical != null) {
+				return false;
+			}
+		} else if (!vertical.equals(other.vertical)) {
 			return false;
 		}
 		return true;
 	}
 
-	public void get(double[] nev) {
-		nev[0] = northing;
-		nev[1] = easting;
-		nev[2] = vertical;
-	}
-
-	public double getEasting() {
+	public BigDecimal getEasting() {
 		return easting;
 	}
 
-	public double getNorthing() {
+	public BigDecimal getNorthing() {
 		return northing;
 	}
 
-	public double getVertical() {
+	public BigDecimal getVertical() {
 		return vertical;
 	}
 
@@ -61,32 +70,22 @@ public class Location {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(easting);
-		result = prime * result + (int) (temp ^ temp >>> 32);
-		temp = Double.doubleToLongBits(northing);
-		result = prime * result + (int) (temp ^ temp >>> 32);
-		temp = Double.doubleToLongBits(vertical);
-		result = prime * result + (int) (temp ^ temp >>> 32);
+		result = prime * result + (easting == null ? 0 : easting.hashCode());
+		result = prime * result + (northing == null ? 0 : northing.hashCode());
+		result = prime * result + (vertical == null ? 0 : vertical.hashCode());
 		return result;
 	}
 
-	public void set(double[] nev) {
-		northing = nev[0];
-		easting = nev[1];
-		vertical = nev[2];
+	public void setEasting(BigDecimal easting) {
+		this.easting = Objects.requireNonNull(easting);
 	}
 
-	public void setEasting(double easting) {
-		this.easting = easting;
+	public void setNorthing(BigDecimal northing) {
+		this.northing = Objects.requireNonNull(northing);
 	}
 
-	public void setNorthing(double northing) {
-		this.northing = northing;
-	}
-
-	public void setVertical(double vertical) {
-		this.vertical = vertical;
+	public void setVertical(BigDecimal vertical) {
+		this.vertical = Objects.requireNonNull(vertical);
 	}
 
 	@Override

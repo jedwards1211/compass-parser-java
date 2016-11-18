@@ -1,5 +1,6 @@
 package org.andork.compass;
 
+import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
 import org.andork.segment.Segment;
@@ -34,6 +35,25 @@ public class LineParserTests {
 	}
 
 	@Test
+	public void testBigDecimal() throws CompassParseError {
+		assertThrowsParseError(() -> parser(" 3.5").bigDecimal("test"), 0, "test");
+		assertThrowsParseError(() -> parser("a3.5").bigDecimal("test"), 0, "test");
+		assertThrowsParseError(() -> parser("e3.5").bigDecimal("test"), 0, "test");
+		LineParser p = parser("3.5kj");
+		Assert.assertEquals(new BigDecimal("3.5"), p.bigDecimal("test"));
+		Assert.assertEquals(3, p.getIndex());
+		p = parser("-3.5e4");
+		Assert.assertEquals(new BigDecimal("-3.5e4"), p.bigDecimal("test"));
+		Assert.assertEquals(p.getSegment().length(), p.getIndex());
+		p = parser("-.5e-2");
+		Assert.assertEquals(new BigDecimal("-.5e-2"), p.bigDecimal("test"));
+		Assert.assertEquals(p.getSegment().length(), p.getIndex());
+		p = parser("-5");
+		Assert.assertEquals(new BigDecimal("-5"), p.bigDecimal("test"));
+		Assert.assertEquals(p.getSegment().length(), p.getIndex());
+	}
+
+	@Test
 	public void testCharacter() throws CompassParseError {
 		LineParser p = parser("abcd");
 		p.character('a', "test");
@@ -43,30 +63,11 @@ public class LineParserTests {
 	}
 
 	@Test
-	public void testDoubleLiteral() throws CompassParseError {
-		assertThrowsParseError(() -> parser(" 3.5").doubleLiteral("test"), 0, "test");
-		assertThrowsParseError(() -> parser("a3.5").doubleLiteral("test"), 0, "test");
-		assertThrowsParseError(() -> parser("e3.5").doubleLiteral("test"), 0, "test");
-		LineParser p = parser("3.5kj");
-		Assert.assertEquals(3.5, p.doubleLiteral("test"), 0.0);
-		Assert.assertEquals(3, p.getIndex());
-		p = parser("-3.5e4");
-		Assert.assertEquals(-3.5e4, p.doubleLiteral("test"), 0.0);
-		Assert.assertEquals(p.getSegment().length(), p.getIndex());
-		p = parser("-.5e-2");
-		Assert.assertEquals(-.5e-2, p.doubleLiteral("test"), 0.0);
-		Assert.assertEquals(p.getSegment().length(), p.getIndex());
-		p = parser("-5");
-		Assert.assertEquals(-5, p.doubleLiteral("test"), 0.0);
-		Assert.assertEquals(p.getSegment().length(), p.getIndex());
-	}
-
-	@Test
 	public void testEmptySegment() {
 		LineParser p = new LineParser(new Segment("", "", 0, 0));
 		assertThrowsParseError(() -> p.whitespace("test"), 0, "test");
 		assertThrowsParseError(() -> p.nonwhitespace("test"), 0, "test");
-		assertThrowsParseError(() -> p.doubleLiteral("test"), 0, "test");
+		assertThrowsParseError(() -> p.bigDecimal("test"), 0, "test");
 		assertThrowsParseError(() -> p.character('c', "test"), 0, "test");
 	}
 
@@ -76,7 +77,7 @@ public class LineParserTests {
 		p.setIndex(p.getSegment().length());
 		assertThrowsParseError(() -> p.whitespace("test"), 5, "test");
 		assertThrowsParseError(() -> p.nonwhitespace("test"), 5, "test");
-		assertThrowsParseError(() -> p.doubleLiteral("test"), 5, "test");
+		assertThrowsParseError(() -> p.bigDecimal("test"), 5, "test");
 		assertThrowsParseError(() -> p.character('c', "test"), 5, "test");
 	}
 
