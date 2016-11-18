@@ -1,4 +1,4 @@
-package org.andork.compass;
+package org.andork.compass.survey;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,11 +14,17 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import org.andork.compass.AzimuthUnit;
+import org.andork.compass.CompassParseError;
+import org.andork.compass.InclinationUnit;
+import org.andork.compass.LengthUnit;
+import org.andork.compass.LrudAssociation;
+import org.andork.compass.LrudItem;
 import org.andork.compass.CompassParseError.Severity;
 import org.andork.segment.Segment;
 import org.andork.segment.SegmentMatcher;
 
-public class CompassParser {
+public class CompassSurveyParser {
 	private static final Pattern EOL = Pattern.compile("\r\n|\r|\n");
 	private static final Pattern COLUMN_HEADER = Pattern.compile("^\\s*FROM\\s+TO[^\r\n]+(\r\n|\r|\n){2}",
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
@@ -29,11 +35,11 @@ public class CompassParser {
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
-			System.out.println("Usage: java " + CompassParser.class.getName() + " <compass file> [<compass files...>]");
+			System.out.println("Usage: java " + CompassSurveyParser.class.getName() + " <compass file> [<compass files...>]");
 			return;
 		}
 
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		try {
 			for (String file : args) {
 				final byte[] bytes = Files.readAllBytes(Paths.get(file));
@@ -63,7 +69,7 @@ public class CompassParser {
 
 	private final List<CompassParseError> errors = new ArrayList<>();
 
-	public CompassParser() {
+	public CompassSurveyParser() {
 
 	}
 

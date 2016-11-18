@@ -1,4 +1,4 @@
-package org.andork.compass;
+package org.andork.compass.survey;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -10,7 +10,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.andork.compass.AzimuthUnit;
+import org.andork.compass.CompassParseError;
+import org.andork.compass.InclinationUnit;
+import org.andork.compass.LengthUnit;
+import org.andork.compass.LrudAssociation;
+import org.andork.compass.LrudItem;
 import org.andork.compass.CompassParseError.Severity;
+import org.andork.compass.survey.CompassSurveyParser;
+import org.andork.compass.survey.CompassShot;
+import org.andork.compass.survey.CompassTrip;
+import org.andork.compass.survey.CompassTripHeader;
+import org.andork.compass.survey.ShotItem;
 import org.andork.segment.Segment;
 import org.junit.Test;
 
@@ -22,7 +33,7 @@ public class CompassParserTests {
 
 	@Test
 	public void azimuthTests() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(true);
 
@@ -43,7 +54,7 @@ public class CompassParserTests {
 
 	@Test
 	public void flagTests() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(false);
 
@@ -96,13 +107,13 @@ public class CompassParserTests {
 
 	@Test
 	public void incompleteShotTests() {
-		CompassParser parser;
+		CompassSurveyParser parser;
 		Segment segment;
 
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(false);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		segment = new Segment("A3", "test.txt", 0, 0);
 		assertNull(parser.parseShot(segment, header));
 		assertEquals(2, parser.getErrors().size());
@@ -111,7 +122,7 @@ public class CompassParserTests {
 				new CompassParseError(Severity.ERROR, "missing length", segment.substring(segment.length()))),
 				parser.getErrors());
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		segment = new Segment("A3 A4", "test.txt", 0, 0);
 		assertNull(parser.parseShot(segment, header));
 		assertEquals(Arrays.asList(
@@ -121,7 +132,7 @@ public class CompassParserTests {
 
 	@Test
 	public void incTests() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(true);
 
@@ -142,7 +153,7 @@ public class CompassParserTests {
 
 	@Test
 	public void lengthTests() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(false);
 
@@ -159,11 +170,11 @@ public class CompassParserTests {
 
 	@Test
 	public void testFlagsAndComments() {
-		CompassParser parser;
+		CompassSurveyParser parser;
 		CompassTripHeader header;
 		CompassShot shot;
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(false);
 		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LX#", "test.txt", 0, 0),
@@ -174,7 +185,7 @@ public class CompassParserTests {
 		assertNull(shot.getComment());
 		assertEquals(parser.getErrors().size(), 0);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(false);
 		shot = parser.parseShot(
@@ -186,7 +197,7 @@ public class CompassParserTests {
 		assertEquals(shot.getComment(), "blah blah");
 		assertEquals(parser.getErrors().size(), 0);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(false);
 		shot = parser.parseShot(
@@ -198,7 +209,7 @@ public class CompassParserTests {
 		assertEquals(shot.getComment(), "blah blah");
 		assertEquals(parser.getErrors().size(), 0);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(true);
 		shot = parser.parseShot(
@@ -210,7 +221,7 @@ public class CompassParserTests {
 		assertNull(shot.getComment());
 		assertEquals(parser.getErrors().size(), 0);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(true);
 		shot = parser.parseShot(
@@ -223,7 +234,7 @@ public class CompassParserTests {
 		assertEquals(shot.getComment(), "blah blah");
 		assertEquals(parser.getErrors().size(), 0);
 
-		parser = new CompassParser();
+		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(true);
 		shot = parser.parseShot(
@@ -238,7 +249,7 @@ public class CompassParserTests {
 
 	@Test
 	public void testParseBasicShot() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(false);
 
@@ -292,7 +303,7 @@ public class CompassParserTests {
 				"B4  B5  23.5 111.0  11.0  0.0  0.0  1.0  1.0 291.0 -11.0 #|PX#\n" +
 				"\f";
 
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		List<CompassTrip> trips = parser.parseCompassSurveyData(new Segment(text, "test.txt", 0, 0));
 		assertEquals(trips.size(), 2);
 
@@ -338,7 +349,7 @@ public class CompassParserTests {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testParseCorrectTripHeader() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = parser.parseTripHeader(new Segment("SECRET CAVE\n" +
 				"SURVEY NAME: A\n" +
 				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
@@ -373,7 +384,7 @@ public class CompassParserTests {
 
 	@Test
 	public void testParseShotWithBacksights() {
-		final CompassParser parser = new CompassParser();
+		final CompassSurveyParser parser = new CompassSurveyParser();
 		final CompassTripHeader header = new CompassTripHeader();
 		header.setHasBacksights(true);
 
@@ -414,7 +425,7 @@ public class CompassParserTests {
 				"\n" +
 				"A2  A1   12.00  135.00   5.00  0.00  4.00  0.50  0.00  Big Room\n" +
 				"A2  A3   41.17   46.00   2.00  0.00  0.00  0.00  0.00  #|PC# Room";
-		parts = CompassParser.splitHeaderAndData(new Segment(text, "test.txt", 0, 0));
+		parts = CompassSurveyParser.splitHeaderAndData(new Segment(text, "test.txt", 0, 0));
 		assertEquals(text.substring(0, text.indexOf("A2")).trim(), parts[0].toString());
 		assertEquals(text.substring(text.indexOf("A2")).trim(), parts[1].toString());
 	}

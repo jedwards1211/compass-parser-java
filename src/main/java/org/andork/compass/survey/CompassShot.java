@@ -1,4 +1,4 @@
-package org.andork.compass;
+package org.andork.compass.survey;
 
 /**
  * Data for a shot between two stations.

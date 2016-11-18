@@ -2,7 +2,7 @@ package org.andork.compass;
 
 import org.andork.segment.Segment;
 
-public class CompassParseError {
+public class CompassParseError extends Exception {
 	public static enum Severity {
 		ERROR, WARNING
 	}
@@ -50,6 +50,7 @@ public class CompassParseError {
 		return true;
 	}
 
+	@Override
 	public String getMessage() {
 		return message;
 	}

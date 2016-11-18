@@ -1,4 +1,4 @@
-package org.andork.compass;
+package org.andork.compass.survey;
 
 import java.util.List;
 

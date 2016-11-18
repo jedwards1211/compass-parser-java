@@ -1,6 +1,12 @@
-package org.andork.compass;
+package org.andork.compass.survey;
 
 import java.util.Date;
+
+import org.andork.compass.AzimuthUnit;
+import org.andork.compass.InclinationUnit;
+import org.andork.compass.LengthUnit;
+import org.andork.compass.LrudAssociation;
+import org.andork.compass.LrudItem;
 
 /**
  * Information about a trip and measurement settings that apply to all shots in
