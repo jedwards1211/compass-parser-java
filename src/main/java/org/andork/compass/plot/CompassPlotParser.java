@@ -103,7 +103,10 @@ public class CompassPlotParser {
 		int line = 0;
 		while ((text = r.readLine()) != null) {
 			try {
-				commands.add(parseCommand(new SegmentParser(new Segment(text, source, line, 0))));
+				CompassPlotCommand command = parseCommand(new SegmentParser(new Segment(text, source, line, 0)));
+				if (command != null) {
+					commands.add(command);
+				}
 			} catch (SegmentParseException e) {
 				errors.add(new CompassParseError(e));
 			}
@@ -135,8 +138,11 @@ public class CompassPlotParser {
 		case 'G':
 			return parseUtmZoneCommand(p.move(-1));
 		default:
-			throw new SegmentParseException("invalid command",
-					p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
+			// ignore for now; there are plenty of undocumented features in the
+			// format...
+			return null;
+		// throw new SegmentParseException("invalid command",
+		// p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
 		}
 	}
 
@@ -286,7 +292,9 @@ public class CompassPlotParser {
 							Severity.WARNING, "distance from entrance is negative",
 							p.getSegment().substring(start, p.getIndex())));
 				}
-				break;
+				// return for now; I've seen an extra undocumented "FL" that
+				// comes after this point
+				return command;
 			default:
 				break;
 			}
