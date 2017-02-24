@@ -173,7 +173,7 @@ public class CompassParserTests {
 		parser = new CompassSurveyParser();
 		header = new CompassTripHeader();
 		header.setHasBacksights(false);
-		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LX#", "test.txt", 0, 0),
+		shot = parser.parseShot(new Segment("A3 A4 4.25 15.00 -85.00 5.00 3.50 0.75 0.50 #|LX #", "test.txt", 0, 0),
 				header);
 		assertTrue(shot.isExcludedFromLength());
 		assertFalse(shot.isExcludedFromPlotting());
@@ -351,7 +351,46 @@ public class CompassParserTests {
 				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
 				"SURVEY TEAM:\n" +
 				"D.SMITH,R.BROWN,S.MURRAY\n" +
-				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLNF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0",
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLBF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0",
+				"test.txt", 0, 0));
+		assertEquals(header.getCaveName(), "SECRET CAVE");
+		assertEquals(header.getSurveyName(), "A");
+		assertEquals(header.getDate(), new Date(79, 6, 10));
+		assertEquals(header.getTeam(), "D.SMITH,R.BROWN,S.MURRAY");
+		assertEquals(new BigDecimal("1.00"), header.getDeclination());
+		assertEquals(header.getAzimuthUnit(), AzimuthUnit.DEGREES);
+		assertEquals(header.getLengthUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getLrudUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getInclinationUnit(), InclinationUnit.DEGREES);
+		assertArrayEquals(header.getLrudOrder(), new LrudItem[] {
+				LrudItem.LEFT,
+				LrudItem.UP,
+				LrudItem.DOWN,
+				LrudItem.RIGHT,
+		});
+		assertArrayEquals(header.getShotMeasurementOrder(), new ShotItem[] {
+				ShotItem.AZIMUTH,
+				ShotItem.INCLINATION,
+				ShotItem.LENGTH,
+		});
+		assertTrue(header.hasBacksights());
+		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testParseTripHeaderWithoutOptionalFlags() {
+		final CompassSurveyParser parser = new CompassSurveyParser();
+		final CompassTripHeader header = parser.parseTripHeader(new Segment("SECRET CAVE\n" +
+				"SURVEY NAME: A\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADL\n" +
+				"\n" +
+				"    FROM       TO   LENGTH  BEARING     DIP      LEFT      UP      DOWN     RIGHT\n" +
+				"\n",
 				"test.txt", 0, 0));
 		assertEquals(header.getCaveName(), "SECRET CAVE");
 		assertEquals(header.getSurveyName(), "A");
@@ -374,8 +413,8 @@ public class CompassParserTests {
 				ShotItem.LENGTH,
 		});
 		assertFalse(header.hasBacksights());
-		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
-		assertEquals(parser.getErrors().size(), 0);
+		assertEquals(LrudAssociation.FROM, header.getLrudAssociation());
+		assertEquals(0, parser.getErrors().size());
 	}
 
 	@Test

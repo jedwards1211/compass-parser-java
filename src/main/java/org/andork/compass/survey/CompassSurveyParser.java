@@ -31,7 +31,7 @@ public class CompassSurveyParser {
 			Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 	private static final Pattern NON_WHITESPACE = Pattern.compile("\\S+");
 	private static final Pattern HEADER_FIELDS = Pattern.compile(
-			"SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:",
+			"SURVEY (NAME|DATE|TEAM):|COMMENT:|DECLINATION:|FORMAT:|CORRECTIONS2?:|FROM",
 			Pattern.CASE_INSENSITIVE);
 
 	private static final BigDecimal POS_90 = new BigDecimal(90);
@@ -143,7 +143,7 @@ public class CompassSurveyParser {
 	 * Parses the data in the given {@link Segment}.
 	 */
 	List<CompassTrip> parseCompassSurveyData(Segment segment) {
-		List<CompassTrip> trips = new ArrayList<CompassTrip>();
+		List<CompassTrip> trips = new ArrayList<>();
 		for (Segment text : segment.split(Pattern.compile("\f"))) {
 			CompassTrip trip = parseTrip(text.trim());
 			if (trip != null) {
@@ -366,12 +366,14 @@ public class CompassSurveyParser {
 		int commentStart = matcher.end();
 		if (matcher.find()) {
 			if (matcher.group().startsWith("#|")) {
-				final Segment flags = matcher.group();
-				commentStart = matcher.end();
-				if (!flags.endsWith("#")) {
-					addError("missing # after flags", flags.substring(flags.length()));
+				int endIndex = segment.indexOf('#', matcher.start() + 1);
+				if (endIndex < 0) {
+					endIndex = matcher.end();
+					addError("missing # after flags", segment.charAtAsSegment(endIndex));
 				}
-				for (int i = 2; i < flags.length() - 1; i++) {
+				commentStart = endIndex + 1;
+				final Segment flags = segment.substring(matcher.start() + 2, endIndex);
+				for (int i = 0; i < flags.length(); i++) {
 					final char flag = flags.charAt(i);
 					switch (Character.toUpperCase(flag)) {
 					case 'L':
@@ -385,6 +387,8 @@ public class CompassSurveyParser {
 						break;
 					case 'C':
 						shot.setDoNotAdjust(true);
+						break;
+					case ' ':
 						break;
 					default:
 						addWarning("unrecognized flag: " + flag, flags.charAtAsSegment(i));
@@ -415,9 +419,7 @@ public class CompassSurveyParser {
 		parseOrder(format.substring(i), header.getShotMeasurementOrder(), this::parseShotItem,
 				"shot item");
 		i += 3;
-		if (format.length() > i) {
-			header.setHasBacksights(format.charAt(i++) == 'B');
-		}
+		header.setHasBacksights(format.length() > i && format.charAt(i++) == 'B');
 		if (format.length() > i) {
 			header.setLrudAssociation(parseLrudAssociation(format.charAtAsSegment(i++)));
 		}
@@ -454,7 +456,7 @@ public class CompassSurveyParser {
 		}
 		trip.setHeader(header);
 
-		List<CompassShot> shots = new ArrayList<CompassShot>();
+		List<CompassShot> shots = new ArrayList<>();
 
 		if (!parts[1].isEmpty()) {
 			final Segment[] data = parts[1].split(EOL);
