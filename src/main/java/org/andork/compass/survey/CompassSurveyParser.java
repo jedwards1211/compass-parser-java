@@ -2,6 +2,7 @@ package org.andork.compass.survey;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -129,6 +131,19 @@ public class CompassSurveyParser {
 			addError("unrecognized azimuth unit: " + unit.charAt(0), unit);
 			return AzimuthUnit.DEGREES;
 		}
+	}
+	
+	/**
+	 * Parses the file at the given {@code path}.
+	 */
+	public List<CompassTrip> parseCompassSurveyData(InputStream in, Object source) throws IOException {
+		Segment data;
+		try (@SuppressWarnings("resource")
+		Scanner s = new Scanner(in, "ASCII").useDelimiter("\\A")) {
+			String result = s.hasNext() ? s.next() : "";
+			data = new Segment(result, source, 0, 0);
+		}
+		return parseCompassSurveyData(data);
 	}
 
 	/**

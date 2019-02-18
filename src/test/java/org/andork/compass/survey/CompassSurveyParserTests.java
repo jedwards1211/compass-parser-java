@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
@@ -21,7 +22,7 @@ import org.andork.compass.LrudItem;
 import org.andork.segment.Segment;
 import org.junit.Test;
 
-public class CompassParserTests {
+public class CompassSurveyParserTests {
 	private static Segment extract(Segment seg, String target) {
 		int index = seg.indexOf(target);
 		return seg.substring(index, index + target.length());
@@ -463,5 +464,16 @@ public class CompassParserTests {
 		parts = CompassSurveyParser.splitHeaderAndData(new Segment(text, "test.txt", 0, 0));
 		assertEquals(text.substring(0, text.indexOf("A2")).trim(), parts[0].toString());
 		assertEquals(text.substring(text.indexOf("A2")).trim(), parts[1].toString());
+	}
+	
+	@Test
+	public void testFulford() throws IOException {
+		CompassSurveyParser parser = new CompassSurveyParser();
+		List<CompassTrip> trips = parser.parseCompassSurveyData(
+			getClass().getResourceAsStream("../fulford/Fulford.dat"), "Fulford.dat");
+		assertEquals(25, trips.size());
+		for (CompassTrip trip : trips) {
+			assertTrue(trip.getShots().size() > 0);
+		}
 	}
 }
