@@ -16,7 +16,7 @@ public class UnitConversionTests {
 	@Test
 	public void testInclinationConversions() {
 		Assert.assertEquals(100,
-				InclinationUnit.convert(new BigDecimal(45), InclinationUnit.PERCENT_GRADE).doubleValue(), 0.0);
+				InclinationUnit.convert(new BigDecimal(45), InclinationUnit.PERCENT_GRADE).doubleValue(), 1e-10);
 		Assert.assertEquals(200, InclinationUnit.convert(new BigDecimal(180), InclinationUnit.GRADS).doubleValue(),
 				0.0);
 		Assert.assertEquals(180, InclinationUnit.convert(new BigDecimal(180), InclinationUnit.DEGREES).doubleValue(),

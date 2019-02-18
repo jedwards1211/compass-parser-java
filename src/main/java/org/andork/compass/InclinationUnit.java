@@ -11,7 +11,7 @@ public enum InclinationUnit {
 		}
 		switch (toUnit) {
 		case PERCENT_GRADE:
-			return new BigDecimal(Math.tan(value.doubleValue()) * 100);
+			return new BigDecimal(Math.tan(Math.toRadians(value.doubleValue())) * 100);
 		case GRADS:
 			return new BigDecimal(value.doubleValue() * 200 / 180);
 		default:
