@@ -62,10 +62,10 @@ public class CompassTripHeader {
 			LrudItem.UP,
 			LrudItem.DOWN,
 	};
-	private final ShotItem[] shotMeasurementOrder = {
+	private ShotItem[] shotMeasurementOrder = {
 			ShotItem.LENGTH,
-			ShotItem.AZIMUTH,
-			ShotItem.INCLINATION,
+			ShotItem.FRONTSIGHT_AZIMUTH,
+			ShotItem.FRONTSIGHT_INCLINATION,
 	};
 	/**
 	 * Whether shots in this trip have backsights.
@@ -245,4 +245,7 @@ public class CompassTripHeader {
 		this.team = team;
 	}
 
+	public void setShotMeasurementOrder(ShotItem[] order) {
+		this.shotMeasurementOrder = order;
+	}
 }

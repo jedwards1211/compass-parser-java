@@ -431,9 +431,12 @@ public class CompassSurveyParser {
 		header.setInclinationUnit(parseInclinationUnit(format.charAtAsSegment(i++)));
 		parseOrder(format.substring(i), header.getLrudOrder(), this::parseLrudItem, "LRUD item");
 		i += 4;
+		if (format.length() >= 15) {
+			header.setShotMeasurementOrder(new ShotItem[5]);
+		}
 		parseOrder(format.substring(i), header.getShotMeasurementOrder(), this::parseShotItem,
 				"shot item");
-		i += 3;
+		i += header.getShotMeasurementOrder().length;
 		header.setHasBacksights(format.length() > i && format.charAt(i++) == 'B');
 		if (format.length() > i) {
 			header.setLrudAssociation(parseLrudAssociation(format.charAtAsSegment(i++)));
@@ -441,13 +444,17 @@ public class CompassSurveyParser {
 	}
 
 	ShotItem parseShotItem(Segment segment) {
-		switch (Character.toUpperCase(segment.charAt(0))) {
+		switch (segment.charAt(0)) {
 		case 'L':
 			return ShotItem.LENGTH;
 		case 'A':
-			return ShotItem.AZIMUTH;
+			return ShotItem.FRONTSIGHT_AZIMUTH;
 		case 'D':
-			return ShotItem.INCLINATION;
+			return ShotItem.FRONTSIGHT_INCLINATION;
+		case 'a':
+			return ShotItem.BACKSIGHT_AZIMUTH;
+		case 'd':
+			return ShotItem.BACKSIGHT_INCLINATION;
 		default:
 			addError("unrecognized shot item: " + segment.charAt(0), segment);
 			return null;

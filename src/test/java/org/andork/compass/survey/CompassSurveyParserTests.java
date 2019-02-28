@@ -322,8 +322,8 @@ public class CompassSurveyParserTests {
 				LrudItem.RIGHT,
 		});
 		assertArrayEquals(trip2.getHeader().getShotMeasurementOrder(), new ShotItem[] {
-				ShotItem.AZIMUTH,
-				ShotItem.INCLINATION,
+				ShotItem.FRONTSIGHT_AZIMUTH,
+				ShotItem.FRONTSIGHT_INCLINATION,
 				ShotItem.LENGTH,
 		});
 		assertFalse(trip2.getHeader().hasBacksights());
@@ -370,9 +370,47 @@ public class CompassSurveyParserTests {
 				LrudItem.RIGHT,
 		});
 		assertArrayEquals(header.getShotMeasurementOrder(), new ShotItem[] {
-				ShotItem.AZIMUTH,
-				ShotItem.INCLINATION,
+				ShotItem.FRONTSIGHT_AZIMUTH,
+				ShotItem.FRONTSIGHT_INCLINATION,
 				ShotItem.LENGTH,
+		});
+		assertTrue(header.hasBacksights());
+		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
+		assertEquals(parser.getErrors().size(), 0);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testParseLongShotFormat() {
+		final CompassSurveyParser parser = new CompassSurveyParser();
+		final CompassTripHeader header = parser.parseTripHeader(new Segment("SECRET CAVE\n" +
+				"SURVEY NAME: A\n" +
+				"SURVEY DATE: 7 10 79  COMMENT:Entrance Passage\n" +
+				"SURVEY TEAM:\n" +
+				"D.SMITH,R.BROWN,S.MURRAY\n" +
+				"DECLINATION: 1.00  FORMAT: DDDDLUDRADLadBF  CORRECTIONS: 2.00 3.00 4.00 CORRECTIONS2: 5.0 6.0",
+				"test.txt", 0, 0));
+		assertEquals(header.getCaveName(), "SECRET CAVE");
+		assertEquals(header.getSurveyName(), "A");
+		assertEquals(header.getDate(), new Date(79, 6, 10));
+		assertEquals(header.getTeam(), "D.SMITH,R.BROWN,S.MURRAY");
+		assertEquals(new BigDecimal("1.00"), header.getDeclination());
+		assertEquals(header.getAzimuthUnit(), AzimuthUnit.DEGREES);
+		assertEquals(header.getLengthUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getLrudUnit(), LengthUnit.DECIMAL_FEET);
+		assertEquals(header.getInclinationUnit(), InclinationUnit.DEGREES);
+		assertArrayEquals(header.getLrudOrder(), new LrudItem[] {
+				LrudItem.LEFT,
+				LrudItem.UP,
+				LrudItem.DOWN,
+				LrudItem.RIGHT,
+		});
+		assertArrayEquals(header.getShotMeasurementOrder(), new ShotItem[] {
+				ShotItem.FRONTSIGHT_AZIMUTH,
+				ShotItem.FRONTSIGHT_INCLINATION,
+				ShotItem.LENGTH,
+				ShotItem.BACKSIGHT_AZIMUTH,
+				ShotItem.BACKSIGHT_INCLINATION
 		});
 		assertTrue(header.hasBacksights());
 		assertEquals(header.getLrudAssociation(), LrudAssociation.FROM);
@@ -409,8 +447,8 @@ public class CompassSurveyParserTests {
 				LrudItem.RIGHT,
 		});
 		assertArrayEquals(header.getShotMeasurementOrder(), new ShotItem[] {
-				ShotItem.AZIMUTH,
-				ShotItem.INCLINATION,
+				ShotItem.FRONTSIGHT_AZIMUTH,
+				ShotItem.FRONTSIGHT_INCLINATION,
 				ShotItem.LENGTH,
 		});
 		assertFalse(header.hasBacksights());
