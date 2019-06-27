@@ -168,7 +168,7 @@ public class CompassPlotParser {
 
 	public BeginSectionCommand parseBeginSectionCommand(SegmentParser p) throws SegmentParseException {
 		p.character('S', missingOrInvalid("command (expected S)"));
-		return new BeginSectionCommand(p.nonwhitespace(missingOrInvalid("section name")).toString());
+		return new BeginSectionCommand(p.match("[^\r\n]+", "missing section name").toString());
 	}
 
 	public BeginSurveyCommand parseBeginSurveyCommand(SegmentParser p) throws SegmentParseException {
