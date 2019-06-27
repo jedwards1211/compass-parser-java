@@ -149,6 +149,13 @@ public class CompassPlotParserTests {
 		Assert.assertEquals(line.indexOf(". "), errors.get(2).getSegment().startCol);
 		Assert.assertEquals(line.indexOf("%2.0"), errors.get(3).getSegment().startCol);
 	}
+	
+	@Test
+	public void testBlankLines() throws IOException {
+		CompassPlotParser parser = new CompassPlotParser();
+		parser.parsePlot(getClass().getResourceAsStream("blankLines.plt"), "blankLines.plt");
+		Assert.assertEquals(0, parser.getErrors().size());
+	}
 
 	@Test
 	public void testFullParse() throws IOException {

@@ -102,6 +102,7 @@ public class CompassPlotParser {
 		String text;
 		int line = 0;
 		while ((text = r.readLine()) != null) {
+			if (text.trim().isEmpty()) continue;
 			try {
 				CompassPlotCommand command = parseCommand(new SegmentParser(new Segment(text, source, line, 0)));
 				if (command != null) {
