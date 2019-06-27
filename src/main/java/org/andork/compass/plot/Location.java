@@ -96,4 +96,13 @@ public class Location {
 				.append(vertical).append("]");
 		return builder.toString();
 	}
+	
+	public static void formatBounds(Location lowerBound, Location upperBound, StringBuilder builder) {
+		builder.append(lowerBound.getNorthing())
+			.append('\t').append(upperBound.getNorthing())
+			.append('\t').append(lowerBound.getEasting())
+			.append('\t').append(upperBound.getEasting())
+			.append('\t').append(lowerBound.getVertical())
+			.append('\t').append(upperBound.getVertical());
+	}
 }

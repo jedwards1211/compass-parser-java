@@ -18,8 +18,6 @@ public class BeginSectionCommand implements CompassPlotCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("BeginSectionCommand [sectionName=").append(sectionName).append("]");
-		return builder.toString();
+		return "S" + sectionName.substring(0, Math.min(20, sectionName.length()));
 	}
 }

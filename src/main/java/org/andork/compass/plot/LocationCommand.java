@@ -39,4 +39,22 @@ public interface LocationCommand extends CompassPlotCommand {
 	public void setStationName(String stationName);
 
 	public void setUp(BigDecimal up);
+	
+	public default void format(StringBuilder builder) {
+		Location location = getLocation();
+		builder.append('\t').append(location.getNorthing());
+		builder.append('\t').append(location.getEasting());
+		builder.append('\t').append(location.getVertical());
+		String stationName = getStationName();
+		builder.append("\tS").append(stationName.substring(0, Math.min(12, stationName.length())));
+		builder.append("\tP");
+		BigDecimal left = getLeft();
+		builder.append('\t').append(left != null ? left : "-9.0");
+		BigDecimal up = getUp();
+		builder.append('\t').append(up != null ? up : "-9.0");
+		BigDecimal down = getDown();
+		builder.append('\t').append(down != null ? down : "-9.0");
+		BigDecimal right = getRight();
+		builder.append('\t').append(right != null ? right : "-9.0");
+	}
 }

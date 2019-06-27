@@ -39,9 +39,12 @@ public class BeginFeatureCommand implements CompassPlotCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("BeginFeatureCommand [featureName=").append(featureName).append(", minValue=").append(minValue)
-				.append(", maxValue=").append(maxValue).append("]");
+		StringBuilder builder = new StringBuilder("F")
+			.append(featureName.substring(0, Math.min(12, featureName.length())));
+		if (minValue != null && maxValue != null) {
+			builder.append("\tR\t");
+			builder.append(minValue.floatValue()).append("\t").append(maxValue.floatValue());
+		}
 		return builder.toString();
 	}
 }

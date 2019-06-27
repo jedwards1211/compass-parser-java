@@ -1,5 +1,6 @@
 package org.andork.compass.plot;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class BeginSurveyCommand implements CompassPlotCommand {
@@ -33,9 +34,21 @@ public class BeginSurveyCommand implements CompassPlotCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("BeginSurveyCommand [surveyName=").append(surveyName).append(", date=").append(date)
-				.append(", comment=").append(comment).append("]");
+		StringBuilder builder = new StringBuilder("N");
+		builder.append(surveyName.substring(0, Math.min(12, surveyName.length())));
+		builder.append("\tD");
+		if (date != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(date);
+			builder.append(' ').append(c.get(Calendar.MONTH) + 1);
+			builder.append(' ').append(c.get(Calendar.DAY_OF_MONTH));
+			builder.append(' ').append(c.get(Calendar.YEAR));
+		} else {
+			builder.append(" 1 1 1");
+		}
+		if (comment != null) {
+			builder.append("\tC").append(comment.substring(0, Math.min(80, comment.length())));
+		}
 		return builder.toString();
 	}
 }

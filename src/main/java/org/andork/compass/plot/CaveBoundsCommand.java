@@ -27,9 +27,11 @@ public class CaveBoundsCommand implements BoundsCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("CaveBoundsCommand [lowerBound=").append(lowerBound).append(", upperBound=").append(upperBound)
-				.append(", distanceToFarthestStation=").append(distanceToFarthestStation).append("]");
+		StringBuilder builder = new StringBuilder("Z");
+		format(builder);
+		if (distanceToFarthestStation != null) {
+			builder.append("\tI\t").append(distanceToFarthestStation);
+		}
 		return builder.toString();
 	}
 }

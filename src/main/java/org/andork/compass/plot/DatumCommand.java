@@ -13,8 +13,6 @@ public class DatumCommand implements CompassPlotCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("DatumCommand [datum=").append(datum).append("]");
-		return builder.toString();
+		return "O" + datum;
 	}
 }

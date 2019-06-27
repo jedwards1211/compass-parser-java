@@ -16,9 +16,8 @@ public class SurveyBoundsCommand implements BoundsCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("SurveyBoundsCommand [lowerBound=").append(lowerBound).append(", upperBound=").append(upperBound)
-				.append("]");
+		StringBuilder builder = new StringBuilder("X");
+		format(builder);
 		return builder.toString();
 	}
 

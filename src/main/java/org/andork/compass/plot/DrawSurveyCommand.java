@@ -93,11 +93,9 @@ public class DrawSurveyCommand implements LocationCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("DrawSurveyCommand [operation=").append(operation).append(", location=").append(location)
-				.append(", stationName=").append(stationName).append(", left=").append(left).append(", right=")
-				.append(right).append(", up=").append(up).append(", down=").append(down)
-				.append(", distanceFromEntrance=").append(distanceFromEntrance).append("]");
+		StringBuilder builder = new StringBuilder(operation == DrawOperation.MOVE_TO ? "M" : "D");
+		format(builder);
+		builder.append("\tI\t").append(distanceFromEntrance != null ? distanceFromEntrance : "-9.0");
 		return builder.toString();
 	}
 }

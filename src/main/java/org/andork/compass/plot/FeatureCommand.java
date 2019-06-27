@@ -79,10 +79,11 @@ public class FeatureCommand implements LocationCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("FeatureCommand [location=").append(location).append(", stationName=").append(stationName)
-				.append(", left=").append(left).append(", right=").append(right).append(", up=").append(up)
-				.append(", down=").append(down).append(", value=").append(value).append("]");
+		StringBuilder builder = new StringBuilder("L");
+		format(builder);
+		if (value != null) {
+			builder.append("\tV\t").append(value);
+		}
 		return builder.toString();
 	}
 

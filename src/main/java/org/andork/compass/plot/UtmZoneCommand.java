@@ -13,8 +13,6 @@ public class UtmZoneCommand implements CompassPlotCommand {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("UTMZoneCommand [utmZone=").append(utmZone).append("]");
-		return builder.toString();
+		return "G" + utmZone;
 	}
 }
