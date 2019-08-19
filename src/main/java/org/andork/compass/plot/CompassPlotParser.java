@@ -38,7 +38,8 @@ public class CompassPlotParser {
 		cal.setLenient(false);
 		try {
 			cal.set(year, month - 1, day);
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new SegmentParseException("invalid date", p.getSegment().substring(start, p.getIndex()));
 		}
 		return cal.getTime();
@@ -52,11 +53,17 @@ public class CompassPlotParser {
 		return commands;
 	}
 
+	private static final BigDecimal NULL_LRUD0 = new BigDecimal(999);
+	private static final BigDecimal NULL_LRUD1 = new BigDecimal("999.9");
+
 	private BigDecimal lrudMeasurement(SegmentParser p, String which) {
 		try {
 			BigDecimal value = p.bigDecimal(missingOrInvalid(which));
-			return value.compareTo(BigDecimal.ZERO) < 0 ? null : value;
-		} catch (SegmentParseException e) {
+			return value.compareTo(BigDecimal.ZERO) < 0
+				|| value.compareTo(NULL_LRUD0) == 0
+				|| value.compareTo(NULL_LRUD1) == 0 ? null : value;
+		}
+		catch (SegmentParseException e) {
 			errors.add(new CompassParseError(e));
 			p.advanceToWhitespace();
 			return null;
@@ -68,7 +75,8 @@ public class CompassPlotParser {
 		final int value;
 		try {
 			value = Integer.parseInt(segment.toString());
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new SegmentParseException("invalid " + what, ex, segment);
 		}
 		return value;
@@ -79,7 +87,8 @@ public class CompassPlotParser {
 		final int value;
 		try {
 			value = Integer.parseInt(segment.toString());
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new SegmentParseException("invalid " + what, ex, segment);
 		}
 		if (value < min || value > max) {
@@ -102,13 +111,15 @@ public class CompassPlotParser {
 		String text;
 		int line = 0;
 		while ((text = r.readLine()) != null) {
-			if (text.trim().isEmpty()) continue;
+			if (text.trim().isEmpty())
+				continue;
 			try {
 				CompassPlotCommand command = parseCommand(new SegmentParser(new Segment(text, source, line, 0)));
 				if (command != null) {
 					commands.add(command);
 				}
-			} catch (SegmentParseException e) {
+			}
+			catch (SegmentParseException e) {
 				errors.add(new CompassParseError(e));
 			}
 			line++;
@@ -192,8 +203,9 @@ public class CompassPlotParser {
 				command.setComment(p.rest().toString().trim());
 				break;
 			default:
-				throw new SegmentParseException("invalid command (expected D or C)",
-						p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
+				throw new SegmentParseException(
+					"invalid command (expected D or C)",
+					p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
 			}
 		}
 		return command;
@@ -230,8 +242,12 @@ public class CompassPlotParser {
 		int start = p.getIndex();
 		command.setDistanceToFarthestStation(p.bigDecimal(missingOrInvalid("distance to farthest station")));
 		if (command.getDistanceToFarthestStation().compareTo(BigDecimal.ZERO) < 0) {
-			errors.add(new CompassParseError(Severity.WARNING, "distance to farthest station is negative",
-					p.getSegment().substring(start, p.getIndex())));
+			errors
+				.add(
+					new CompassParseError(
+						Severity.WARNING,
+						"distance to farthest station is negative",
+						p.getSegment().substring(start, p.getIndex())));
 		}
 		return command;
 	}
@@ -253,8 +269,9 @@ public class CompassPlotParser {
 			op = DrawOperation.LINE_TO;
 			break;
 		default:
-			throw new SegmentParseException("invalid command (expected M or D)",
-					p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
+			throw new SegmentParseException(
+				"invalid command (expected M or D)",
+				p.move(-1).getSegment().charAtAsSegment(p.getIndex()));
 		}
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
@@ -277,21 +294,24 @@ public class CompassPlotParser {
 			case 'P':
 				p.whitespace("missing whitespace before left");
 				command.setLeft(lrudMeasurement(p, "left"));
-				p.whitespace("missing whitespace before right");
-				command.setRight(lrudMeasurement(p, "right"));
 				p.whitespace("missing whitespace before up");
 				command.setUp(lrudMeasurement(p, "up"));
 				p.whitespace("missing whitespace before down");
 				command.setDown(lrudMeasurement(p, "down"));
+				p.whitespace("missing whitespace before right");
+				command.setRight(lrudMeasurement(p, "right"));
 				break;
 			case 'I':
 				p.whitespace("missing whitespace before distance from entrance");
 				int start = p.getIndex();
 				command.setDistanceFromEntrance(p.bigDecimal(missingOrInvalid("distance from entrance")));
 				if (command.getDistanceFromEntrance().compareTo(BigDecimal.ZERO) < 0) {
-					errors.add(new CompassParseError(
-							Severity.WARNING, "distance from entrance is negative",
-							p.getSegment().substring(start, p.getIndex())));
+					errors
+						.add(
+							new CompassParseError(
+								Severity.WARNING,
+								"distance from entrance is negative",
+								p.getSegment().substring(start, p.getIndex())));
 				}
 				// return for now; I've seen an extra undocumented "FL" that
 				// comes after this point
