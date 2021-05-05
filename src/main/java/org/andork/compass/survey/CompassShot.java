@@ -1,6 +1,8 @@
 package org.andork.compass.survey;
 
-import java.math.BigDecimal;
+import org.andork.unit.Angle;
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
 
 /**
  * Data for a shot between two stations.
@@ -21,52 +23,52 @@ public class CompassShot {
 	/**
 	 * Distance between the two stations, in feet
 	 */
-	private BigDecimal length = null;
+	private UnitizedDouble<Length> length = null;
 	/**
 	 * Compass bearing toward to station at from station, in degrees
 	 */
-	private BigDecimal frontsightAzimuth = null;
+	private UnitizedDouble<Angle> frontsightAzimuth = null;
 	/**
 	 * Vertical angle toward to station at from station, in degrees
 	 */
-	private BigDecimal frontsightInclination = null;
+	private UnitizedDouble<Angle> frontsightInclination = null;
 	/**
 	 * Compass bearing toward from station at to station, in degrees
 	 */
-	private BigDecimal backsightAzimuth = null;
+	private UnitizedDouble<Angle> backsightAzimuth = null;
 	/**
 	 * Vertical angle toward from station at to station, in degrees
 	 */
-	private BigDecimal backsightInclination = null;
+	private UnitizedDouble<Angle> backsightInclination = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private BigDecimal left = null;
+	private UnitizedDouble<Length> left = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to left wall (when looking
 	 * toward the next station), in feet.
 	 */
-	private BigDecimal right = null;
+	private UnitizedDouble<Length> right = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the ceiling.
 	 */
-	private BigDecimal up = null;
+	private UnitizedDouble<Length> up = null;
 	/**
 	 * Distance from station determined by corresponding
 	 * {@link CompassTripHeader#getLrudAssociation()} to the floor.
 	 */
-	private BigDecimal down = null;
+	private UnitizedDouble<Length> down = null;
 	/**
 	 * Arbitrary user comment for this shot
 	 */
 	private String comment;
 	/**
-	 * Whether to exclude this shot's {@link #length} from the total length of
-	 * the cave.
+	 * Whether to exclude this shot's {@link #length} from the total length of the
+	 * cave.
 	 */
 	private boolean excludedFromLength = false;
 	/**
@@ -78,16 +80,15 @@ public class CompassShot {
 	 */
 	private boolean excludedFromAllProcessing = false;
 	/**
-	 * If <code>true</code>, this shot should not be adjusted when closing
-	 * loops.
+	 * If <code>true</code>, this shot should not be adjusted when closing loops.
 	 */
 	private boolean doNotAdjust = false;
 
-	public BigDecimal getBacksightAzimuth() {
+	public UnitizedDouble<Angle> getBacksightAzimuth() {
 		return backsightAzimuth;
 	}
 
-	public BigDecimal getBacksightInclination() {
+	public UnitizedDouble<Angle> getBacksightInclination() {
 		return backsightInclination;
 	}
 
@@ -95,7 +96,7 @@ public class CompassShot {
 		return comment;
 	}
 
-	public BigDecimal getDown() {
+	public UnitizedDouble<Length> getDown() {
 		return down;
 	}
 
@@ -103,23 +104,23 @@ public class CompassShot {
 		return fromStationName;
 	}
 
-	public BigDecimal getFrontsightAzimuth() {
+	public UnitizedDouble<Angle> getFrontsightAzimuth() {
 		return frontsightAzimuth;
 	}
 
-	public BigDecimal getFrontsightInclination() {
+	public UnitizedDouble<Angle> getFrontsightInclination() {
 		return frontsightInclination;
 	}
 
-	public BigDecimal getLeft() {
+	public UnitizedDouble<Length> getLeft() {
 		return left;
 	}
 
-	public BigDecimal getLength() {
+	public UnitizedDouble<Length> getLength() {
 		return length;
 	}
 
-	public BigDecimal getRight() {
+	public UnitizedDouble<Length> getRight() {
 		return right;
 	}
 
@@ -127,7 +128,7 @@ public class CompassShot {
 		return toStationName;
 	}
 
-	public BigDecimal getUp() {
+	public UnitizedDouble<Length> getUp() {
 		return up;
 	}
 
@@ -147,11 +148,11 @@ public class CompassShot {
 		return excludedFromPlotting;
 	}
 
-	public void setBacksightAzimuth(BigDecimal backsightAzimuth) {
+	public void setBacksightAzimuth(UnitizedDouble<Angle> backsightAzimuth) {
 		this.backsightAzimuth = backsightAzimuth;
 	}
 
-	public void setBacksightInclination(BigDecimal backsightInclination) {
+	public void setBacksightInclination(UnitizedDouble<Angle> backsightInclination) {
 		this.backsightInclination = backsightInclination;
 	}
 
@@ -163,7 +164,7 @@ public class CompassShot {
 		this.doNotAdjust = doNotAdjust;
 	}
 
-	public void setDown(BigDecimal down) {
+	public void setDown(UnitizedDouble<Length> down) {
 		this.down = down;
 	}
 
@@ -183,23 +184,23 @@ public class CompassShot {
 		this.fromStationName = fromStationName;
 	}
 
-	public void setFrontsightAzimuth(BigDecimal frontsightAzimuth) {
+	public void setFrontsightAzimuth(UnitizedDouble<Angle> frontsightAzimuth) {
 		this.frontsightAzimuth = frontsightAzimuth;
 	}
 
-	public void setFrontsightInclination(BigDecimal frontsightInclination) {
+	public void setFrontsightInclination(UnitizedDouble<Angle> frontsightInclination) {
 		this.frontsightInclination = frontsightInclination;
 	}
 
-	public void setLeft(BigDecimal left) {
+	public void setLeft(UnitizedDouble<Length> left) {
 		this.left = left;
 	}
 
-	public void setLength(BigDecimal length) {
+	public void setLength(UnitizedDouble<Length> length) {
 		this.length = length;
 	}
 
-	public void setRight(BigDecimal right) {
+	public void setRight(UnitizedDouble<Length> right) {
 		this.right = right;
 	}
 
@@ -207,22 +208,47 @@ public class CompassShot {
 		this.toStationName = toStationName;
 	}
 
-	public void setUp(BigDecimal up) {
+	public void setUp(UnitizedDouble<Length> up) {
 		this.up = up;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CompassShot [fromStationName=").append(fromStationName).append(", toStationName=")
-				.append(toStationName).append(", length=").append(length).append(", frontsightAzimuth=")
-				.append(frontsightAzimuth).append(", frontsightInclination=").append(frontsightInclination)
-				.append(", backsightAzimuth=").append(backsightAzimuth).append(", backsightInclination=")
-				.append(backsightInclination).append(", left=").append(left).append(", right=").append(right)
-				.append(", up=").append(up).append(", down=").append(down).append(", comment=").append(comment)
-				.append(", excludedFromLength=").append(excludedFromLength).append(", excludedFromPlotting=")
-				.append(excludedFromPlotting).append(", excludedFromAllProcessing=").append(excludedFromAllProcessing)
-				.append(", doNotAdjust=").append(doNotAdjust).append("]");
+		builder
+			.append("CompassShot [fromStationName=")
+			.append(fromStationName)
+			.append(", toStationName=")
+			.append(toStationName)
+			.append(", length=")
+			.append(length)
+			.append(", frontsightAzimuth=")
+			.append(frontsightAzimuth)
+			.append(", frontsightInclination=")
+			.append(frontsightInclination)
+			.append(", backsightAzimuth=")
+			.append(backsightAzimuth)
+			.append(", backsightInclination=")
+			.append(backsightInclination)
+			.append(", left=")
+			.append(left)
+			.append(", right=")
+			.append(right)
+			.append(", up=")
+			.append(up)
+			.append(", down=")
+			.append(down)
+			.append(", comment=")
+			.append(comment)
+			.append(", excludedFromLength=")
+			.append(excludedFromLength)
+			.append(", excludedFromPlotting=")
+			.append(excludedFromPlotting)
+			.append(", excludedFromAllProcessing=")
+			.append(excludedFromAllProcessing)
+			.append(", doNotAdjust=")
+			.append(doNotAdjust)
+			.append("]");
 		return builder.toString();
 	}
 }

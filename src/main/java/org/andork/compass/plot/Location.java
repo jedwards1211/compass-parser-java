@@ -1,18 +1,20 @@
 package org.andork.compass.plot;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
+
 public class Location {
-	private BigDecimal northing;
-	private BigDecimal easting;
-	private BigDecimal vertical;
+	private UnitizedDouble<Length> northing;
+	private UnitizedDouble<Length> easting;
+	private UnitizedDouble<Length> vertical;
 
 	public Location() {
-		this(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+		this(Length.meters(Double.NaN), Length.meters(Double.NaN), Length.meters(Double.NaN));
 	}
 
-	public Location(BigDecimal northing, BigDecimal easting, BigDecimal vertical) {
+	public Location(UnitizedDouble<Length> northing, UnitizedDouble<Length> easting, UnitizedDouble<Length> vertical) {
 		this.northing = northing;
 		this.easting = easting;
 		this.vertical = vertical;
@@ -34,35 +36,38 @@ public class Location {
 			if (other.easting != null) {
 				return false;
 			}
-		} else if (!easting.equals(other.easting)) {
+		}
+		else if (!easting.equals(other.easting)) {
 			return false;
 		}
 		if (northing == null) {
 			if (other.northing != null) {
 				return false;
 			}
-		} else if (!northing.equals(other.northing)) {
+		}
+		else if (!northing.equals(other.northing)) {
 			return false;
 		}
 		if (vertical == null) {
 			if (other.vertical != null) {
 				return false;
 			}
-		} else if (!vertical.equals(other.vertical)) {
+		}
+		else if (!vertical.equals(other.vertical)) {
 			return false;
 		}
 		return true;
 	}
 
-	public BigDecimal getEasting() {
+	public UnitizedDouble<Length> getEasting() {
 		return easting;
 	}
 
-	public BigDecimal getNorthing() {
+	public UnitizedDouble<Length> getNorthing() {
 		return northing;
 	}
 
-	public BigDecimal getVertical() {
+	public UnitizedDouble<Length> getVertical() {
 		return vertical;
 	}
 
@@ -76,33 +81,44 @@ public class Location {
 		return result;
 	}
 
-	public void setEasting(BigDecimal easting) {
+	public void setEasting(UnitizedDouble<Length> easting) {
 		this.easting = Objects.requireNonNull(easting);
 	}
 
-	public void setNorthing(BigDecimal northing) {
+	public void setNorthing(UnitizedDouble<Length> northing) {
 		this.northing = Objects.requireNonNull(northing);
 	}
 
-	public void setVertical(BigDecimal vertical) {
+	public void setVertical(UnitizedDouble<Length> vertical) {
 		this.vertical = Objects.requireNonNull(vertical);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Location [northing=").append(northing).append(", easting=").append(easting)
-				.append(", vertical=")
-				.append(vertical).append("]");
+		builder
+			.append("Location [northing=")
+			.append(northing)
+			.append(", easting=")
+			.append(easting)
+			.append(", vertical=")
+			.append(vertical)
+			.append("]");
 		return builder.toString();
 	}
-	
+
 	public static void formatBounds(Location lowerBound, Location upperBound, StringBuilder builder) {
-		builder.append(lowerBound.getNorthing())
-			.append('\t').append(upperBound.getNorthing())
-			.append('\t').append(lowerBound.getEasting())
-			.append('\t').append(upperBound.getEasting())
-			.append('\t').append(lowerBound.getVertical())
-			.append('\t').append(upperBound.getVertical());
+		builder
+			.append(lowerBound.getNorthing())
+			.append('\t')
+			.append(upperBound.getNorthing())
+			.append('\t')
+			.append(lowerBound.getEasting())
+			.append('\t')
+			.append(upperBound.getEasting())
+			.append('\t')
+			.append(lowerBound.getVertical())
+			.append('\t')
+			.append(upperBound.getVertical());
 	}
 }

@@ -1,6 +1,5 @@
 package org.andork.compass.survey;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import org.andork.compass.AzimuthUnit;
@@ -8,6 +7,9 @@ import org.andork.compass.InclinationUnit;
 import org.andork.compass.LengthUnit;
 import org.andork.compass.LrudAssociation;
 import org.andork.compass.LrudItem;
+import org.andork.unit.Angle;
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
 
 /**
  * Information about a trip and measurement settings that apply to all shots in
@@ -31,14 +33,14 @@ public class CompassTripHeader {
 	 */
 	private String comment;
 	/**
-	 * The humans or killer robots who performed this survey. Unfortunately
-	 * compass has no standard format for delineating surveyor names.
+	 * The humans or killer robots who performed this survey. Unfortunately compass
+	 * has no standard format for delineating surveyor names.
 	 */
 	private String team;
 	/**
 	 * Magnetic declination, in degrees
 	 */
-	private BigDecimal declination = BigDecimal.ZERO;
+	private UnitizedDouble<Angle> declination = Angle.degrees(0);
 	/**
 	 * Display for shot lengths
 	 */
@@ -56,17 +58,9 @@ public class CompassTripHeader {
 	 */
 	private InclinationUnit inclinationUnit = InclinationUnit.DEGREES;
 
-	private final LrudItem[] lrudOrder = {
-			LrudItem.LEFT,
-			LrudItem.RIGHT,
-			LrudItem.UP,
-			LrudItem.DOWN,
-	};
-	private ShotItem[] shotMeasurementOrder = {
-			ShotItem.LENGTH,
-			ShotItem.FRONTSIGHT_AZIMUTH,
-			ShotItem.FRONTSIGHT_INCLINATION,
-	};
+	private final LrudItem[] lrudOrder = { LrudItem.LEFT, LrudItem.RIGHT, LrudItem.UP, LrudItem.DOWN, };
+	private ShotItem[] shotMeasurementOrder =
+		{ ShotItem.LENGTH, ShotItem.FRONTSIGHT_AZIMUTH, ShotItem.FRONTSIGHT_INCLINATION, };
 	/**
 	 * Whether shots in this trip have backsights.
 	 */
@@ -79,37 +73,37 @@ public class CompassTripHeader {
 	/**
 	 * Correction added to the length of each shot in this trip, in feet.
 	 */
-	private BigDecimal lengthCorrection = BigDecimal.ZERO;
+	private UnitizedDouble<Length> lengthCorrection = Length.feet(0);
 	/**
 	 * Correction added to the frontsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private BigDecimal frontsightAzimuthCorrection = BigDecimal.ZERO;
+	private UnitizedDouble<Angle> frontsightAzimuthCorrection = Angle.degrees(0);
 	/**
-	 * Correction added to the frontsight inclination of each shot in this trip,
-	 * in degrees.
+	 * Correction added to the frontsight inclination of each shot in this trip, in
+	 * degrees.
 	 */
-	private BigDecimal frontsightInclinationCorrection = BigDecimal.ZERO;
+	private UnitizedDouble<Angle> frontsightInclinationCorrection = Angle.degrees(0);
 	/**
 	 * Correction added to the backsight azimuth of each shot in this trip, in
 	 * degrees.
 	 */
-	private BigDecimal backsightAzimuthCorrection = BigDecimal.ZERO;
+	private UnitizedDouble<Angle> backsightAzimuthCorrection = Angle.degrees(0);
 	/**
-	 * Correction added to the backsight inclination of each shot in this trip,
-	 * in degrees.
+	 * Correction added to the backsight inclination of each shot in this trip, in
+	 * degrees.
 	 */
-	private BigDecimal backsightInclinationCorrection = BigDecimal.ZERO;
+	private UnitizedDouble<Angle> backsightInclinationCorrection = Angle.degrees(0);
 
 	public AzimuthUnit getAzimuthUnit() {
 		return azimuthUnit;
 	}
 
-	public BigDecimal getBacksightAzimuthCorrection() {
+	public UnitizedDouble<Angle> getBacksightAzimuthCorrection() {
 		return backsightAzimuthCorrection;
 	}
 
-	public BigDecimal getBacksightInclinationCorrection() {
+	public UnitizedDouble<Angle> getBacksightInclinationCorrection() {
 		return backsightInclinationCorrection;
 	}
 
@@ -125,15 +119,15 @@ public class CompassTripHeader {
 		return date;
 	}
 
-	public BigDecimal getDeclination() {
+	public UnitizedDouble<Angle> getDeclination() {
 		return declination;
 	}
 
-	public BigDecimal getFrontsightAzimuthCorrection() {
+	public UnitizedDouble<Angle> getFrontsightAzimuthCorrection() {
 		return frontsightAzimuthCorrection;
 	}
 
-	public BigDecimal getFrontsightInclinationCorrection() {
+	public UnitizedDouble<Angle> getFrontsightInclinationCorrection() {
 		return frontsightInclinationCorrection;
 	}
 
@@ -141,7 +135,7 @@ public class CompassTripHeader {
 		return inclinationUnit;
 	}
 
-	public BigDecimal getLengthCorrection() {
+	public UnitizedDouble<Length> getLengthCorrection() {
 		return lengthCorrection;
 	}
 
@@ -181,11 +175,11 @@ public class CompassTripHeader {
 		this.azimuthUnit = azimuthUnit;
 	}
 
-	public void setBacksightAzimuthCorrection(BigDecimal backsightAzimuthCorrection) {
+	public void setBacksightAzimuthCorrection(UnitizedDouble<Angle> backsightAzimuthCorrection) {
 		this.backsightAzimuthCorrection = backsightAzimuthCorrection;
 	}
 
-	public void setBacksightInclinationCorrection(BigDecimal backsightInclinationCorrection) {
+	public void setBacksightInclinationCorrection(UnitizedDouble<Angle> backsightInclinationCorrection) {
 		this.backsightInclinationCorrection = backsightInclinationCorrection;
 	}
 
@@ -201,15 +195,15 @@ public class CompassTripHeader {
 		this.date = date;
 	}
 
-	public void setDeclination(BigDecimal declination) {
+	public void setDeclination(UnitizedDouble<Angle> declination) {
 		this.declination = declination;
 	}
 
-	public void setFrontsightAzimuthCorrection(BigDecimal frontsightAzimuthCorrection) {
+	public void setFrontsightAzimuthCorrection(UnitizedDouble<Angle> frontsightAzimuthCorrection) {
 		this.frontsightAzimuthCorrection = frontsightAzimuthCorrection;
 	}
 
-	public void setFrontsightInclinationCorrection(BigDecimal frontsightInclinationCorrection) {
+	public void setFrontsightInclinationCorrection(UnitizedDouble<Angle> frontsightInclinationCorrection) {
 		this.frontsightInclinationCorrection = frontsightInclinationCorrection;
 	}
 
@@ -221,7 +215,7 @@ public class CompassTripHeader {
 		this.inclinationUnit = inclinationUnit;
 	}
 
-	public void setLengthCorrection(BigDecimal lengthCorrection) {
+	public void setLengthCorrection(UnitizedDouble<Length> lengthCorrection) {
 		this.lengthCorrection = lengthCorrection;
 	}
 

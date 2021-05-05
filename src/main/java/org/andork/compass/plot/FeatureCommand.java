@@ -2,22 +2,25 @@ package org.andork.compass.plot;
 
 import java.math.BigDecimal;
 
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
+
 public class FeatureCommand implements LocationCommand {
 	private final Location location = new Location();
 	private String stationName;
-	private BigDecimal left = null;
-	private BigDecimal right = null;
-	private BigDecimal up = null;
-	private BigDecimal down = null;
+	private UnitizedDouble<Length> left = null;
+	private UnitizedDouble<Length> right = null;
+	private UnitizedDouble<Length> up = null;
+	private UnitizedDouble<Length> down = null;
 	private BigDecimal value = null;
 
 	@Override
-	public BigDecimal getDown() {
+	public UnitizedDouble<Length> getDown() {
 		return down;
 	}
 
 	@Override
-	public BigDecimal getLeft() {
+	public UnitizedDouble<Length> getLeft() {
 		return left;
 	}
 
@@ -27,7 +30,7 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public BigDecimal getRight() {
+	public UnitizedDouble<Length> getRight() {
 		return right;
 	}
 
@@ -37,7 +40,7 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public BigDecimal getUp() {
+	public UnitizedDouble<Length> getUp() {
 		return up;
 	}
 
@@ -49,17 +52,17 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public void setDown(BigDecimal down) {
+	public void setDown(UnitizedDouble<Length> down) {
 		this.down = down;
 	}
 
 	@Override
-	public void setLeft(BigDecimal left) {
+	public void setLeft(UnitizedDouble<Length> left) {
 		this.left = left;
 	}
 
 	@Override
-	public void setRight(BigDecimal right) {
+	public void setRight(UnitizedDouble<Length> right) {
 		this.right = right;
 	}
 
@@ -69,7 +72,7 @@ public class FeatureCommand implements LocationCommand {
 	}
 
 	@Override
-	public void setUp(BigDecimal up) {
+	public void setUp(UnitizedDouble<Length> up) {
 		this.up = up;
 	}
 

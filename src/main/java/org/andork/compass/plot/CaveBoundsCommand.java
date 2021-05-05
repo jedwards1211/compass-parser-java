@@ -1,13 +1,14 @@
 package org.andork.compass.plot;
 
-import java.math.BigDecimal;
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
 
 public class CaveBoundsCommand implements BoundsCommand {
 	private final Location lowerBound = new Location();
 	private final Location upperBound = new Location();
-	private BigDecimal distanceToFarthestStation = null;
+	private UnitizedDouble<Length> distanceToFarthestStation = null;
 
-	public BigDecimal getDistanceToFarthestStation() {
+	public UnitizedDouble<Length> getDistanceToFarthestStation() {
 		return distanceToFarthestStation;
 	}
 
@@ -21,7 +22,7 @@ public class CaveBoundsCommand implements BoundsCommand {
 		return upperBound;
 	}
 
-	public void setDistanceToFarthestStation(BigDecimal distanceToFarthestStation) {
+	public void setDistanceToFarthestStation(UnitizedDouble<Length> distanceToFarthestStation) {
 		this.distanceToFarthestStation = distanceToFarthestStation;
 	}
 
@@ -30,7 +31,7 @@ public class CaveBoundsCommand implements BoundsCommand {
 		StringBuilder builder = new StringBuilder("Z");
 		format(builder);
 		if (distanceToFarthestStation != null) {
-			builder.append("\tI\t").append(distanceToFarthestStation);
+			builder.append("\tI\t").append(distanceToFarthestStation.get(Length.feet));
 		}
 		return builder.toString();
 	}

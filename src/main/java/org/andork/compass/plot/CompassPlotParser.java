@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.andork.compass.CompassParseError;
@@ -21,6 +21,8 @@ import org.andork.compass.CompassParseError.Severity;
 import org.andork.segment.Segment;
 import org.andork.segment.SegmentParseException;
 import org.andork.segment.SegmentParser;
+import org.andork.unit.Length;
+import org.andork.unit.UnitizedDouble;
 
 public class CompassPlotParser {
 	private static final Pattern UINT_10 = Pattern.compile("[1-9]\\d*");
@@ -53,15 +55,15 @@ public class CompassPlotParser {
 		return commands;
 	}
 
-	private static final BigDecimal NULL_LRUD0 = new BigDecimal(999);
-	private static final BigDecimal NULL_LRUD1 = new BigDecimal("999.9");
+	private static final UnitizedDouble<Length> NULL_LRUD0 = Length.feet(999);
+	private static final UnitizedDouble<Length> NULL_LRUD1 = Length.feet(999.9);
 
-	private BigDecimal lrudMeasurement(SegmentParser p, String which) {
+	private UnitizedDouble<Length> lrudMeasurement(SegmentParser p, String which) {
 		try {
-			BigDecimal value = p.bigDecimal(missingOrInvalid(which));
-			return value.compareTo(BigDecimal.ZERO) < 0
-				|| value.compareTo(NULL_LRUD0) == 0
-				|| value.compareTo(NULL_LRUD1) == 0 ? null : value;
+			UnitizedDouble<Length> value = parseFeet(p, missingOrInvalid(which));
+			return value.isNegative() || value.compareTo(NULL_LRUD0) == 0 || value.compareTo(NULL_LRUD1) == 0
+				? null
+				: value;
 		}
 		catch (SegmentParseException e) {
 			errors.add(new CompassParseError(e));
@@ -211,19 +213,24 @@ public class CompassPlotParser {
 		return command;
 	}
 
+	private static UnitizedDouble<Length> parseFeet(SegmentParser p, Function<SegmentParser, String> errorMessage)
+		throws SegmentParseException {
+		return Length.feet(p.bigDecimal(missingOrInvalid("min northing")).doubleValue());
+	}
+
 	public void parseBoundsCommand(SegmentParser p, BoundsCommand command) throws SegmentParseException {
 		p.whitespace("missing whitespace before min northing");
-		command.getLowerBound().setNorthing(p.bigDecimal(missingOrInvalid("min northing")));
+		command.getLowerBound().setNorthing(parseFeet(p, missingOrInvalid("min northing")));
 		p.whitespace("missing whitespace before max northing");
-		command.getUpperBound().setNorthing(p.bigDecimal(missingOrInvalid("max northing")));
+		command.getUpperBound().setNorthing(parseFeet(p, missingOrInvalid("max northing")));
 		p.whitespace("missing whitespace before min easting");
-		command.getLowerBound().setEasting(p.bigDecimal(missingOrInvalid("min easting")));
+		command.getLowerBound().setEasting(parseFeet(p, missingOrInvalid("min easting")));
 		p.whitespace("missing whitespace before max easting");
-		command.getUpperBound().setEasting(p.bigDecimal(missingOrInvalid("max easting")));
+		command.getUpperBound().setEasting(parseFeet(p, missingOrInvalid("max easting")));
 		p.whitespace("missing whitespace before min vertical");
-		command.getLowerBound().setVertical(p.bigDecimal(missingOrInvalid("min vertical")));
+		command.getLowerBound().setVertical(parseFeet(p, missingOrInvalid("min vertical")));
 		p.whitespace("missing whitespace before max vertical");
-		command.getUpperBound().setVertical(p.bigDecimal(missingOrInvalid("max vertical")));
+		command.getUpperBound().setVertical(parseFeet(p, missingOrInvalid("max vertical")));
 	}
 
 	public CaveBoundsCommand parseCaveBoundsCommand(SegmentParser p) throws SegmentParseException {
@@ -240,8 +247,8 @@ public class CompassPlotParser {
 		p.character('I', missingOrInvalid("command (expected I)"));
 		p.whitespace("missing whitespace before distance to farthest station");
 		int start = p.getIndex();
-		command.setDistanceToFarthestStation(p.bigDecimal(missingOrInvalid("distance to farthest station")));
-		if (command.getDistanceToFarthestStation().compareTo(BigDecimal.ZERO) < 0) {
+		command.setDistanceToFarthestStation(parseFeet(p, missingOrInvalid("distance to farthest station")));
+		if (command.getDistanceToFarthestStation().isNegative()) {
 			errors
 				.add(
 					new CompassParseError(
@@ -276,11 +283,11 @@ public class CompassPlotParser {
 		DrawSurveyCommand command = new DrawSurveyCommand(op);
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.bigDecimal(missingOrInvalid("northing")));
+		command.getLocation().setNorthing(parseFeet(p, missingOrInvalid("northing")));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.bigDecimal(missingOrInvalid("easting")));
+		command.getLocation().setEasting(parseFeet(p, missingOrInvalid("easting")));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.bigDecimal(missingOrInvalid("vertical")));
+		command.getLocation().setVertical(parseFeet(p, missingOrInvalid("vertical")));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
@@ -304,8 +311,8 @@ public class CompassPlotParser {
 			case 'I':
 				p.whitespace("missing whitespace before distance from entrance");
 				int start = p.getIndex();
-				command.setDistanceFromEntrance(p.bigDecimal(missingOrInvalid("distance from entrance")));
-				if (command.getDistanceFromEntrance().compareTo(BigDecimal.ZERO) < 0) {
+				command.setDistanceFromEntrance(parseFeet(p, missingOrInvalid("distance from entrance")));
+				if (command.getDistanceFromEntrance().isNegative()) {
 					errors
 						.add(
 							new CompassParseError(
@@ -329,11 +336,11 @@ public class CompassPlotParser {
 		FeatureCommand command = new FeatureCommand();
 
 		p.whitespace("missing whitespace before northing");
-		command.getLocation().setNorthing(p.bigDecimal(missingOrInvalid("northing")));
+		command.getLocation().setNorthing(parseFeet(p, missingOrInvalid("northing")));
 		p.whitespace("missing whitespace before easting");
-		command.getLocation().setEasting(p.bigDecimal(missingOrInvalid("easting")));
+		command.getLocation().setEasting(parseFeet(p, missingOrInvalid("easting")));
 		p.whitespace("missing whitespace before vertical");
-		command.getLocation().setVertical(p.bigDecimal(missingOrInvalid("vertical")));
+		command.getLocation().setVertical(parseFeet(p, missingOrInvalid("vertical")));
 
 		while (!p.atEnd()) {
 			p.whitespace("missing whitespace before next command");
