@@ -10,6 +10,7 @@ import org.andork.compass.ExceptionRunnable;
 import org.andork.segment.Segment;
 import org.andork.segment.SegmentParseException;
 import org.andork.segment.SegmentParser;
+import org.andork.unit.Length;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,7 +54,7 @@ public class CompassPlotParserTests {
 	@Test
 	public void testInvalidParseDrawSurveyCommand() {
 		assertThrowsParseError(() -> parseDrawSurveyCommand("Q"), 0, "invalid command (expected M or D)");
-		assertThrowsParseError(() -> parseDrawSurveyCommand("D X"), 2, "invalid northing");
+		assertThrowsParseError(() -> parseDrawSurveyCommand("D X"), 2, "invalid min northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D128.2"), 1, "missing whitespace before northing");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D 128.2-65.9"), 7, "missing whitespace before easting");
 		assertThrowsParseError(() -> parseDrawSurveyCommand("D 128.2 -65.9 -86.8 S "), 21, "missing station name");
@@ -66,7 +67,7 @@ public class CompassPlotParserTests {
 	@Test
 	public void testInvalidParseFeatureCommand() {
 		assertThrowsParseError(() -> parseFeatureCommand("Q"), 0, "invalid command (expected L)");
-		assertThrowsParseError(() -> parseFeatureCommand("L X"), 2, "invalid northing");
+		assertThrowsParseError(() -> parseFeatureCommand("L X"), 2, "invalid min northing");
 		assertThrowsParseError(() -> parseFeatureCommand("L128.2"), 1, "missing whitespace before northing");
 		assertThrowsParseError(() -> parseFeatureCommand("L 128.2-65.9"), 7, "missing whitespace before easting");
 		assertThrowsParseError(() -> parseFeatureCommand("L 128.2 -65.9 -86.8 S "), 21, "missing station name");
@@ -80,15 +81,15 @@ public class CompassPlotParserTests {
 	public void testParseDrawSurveyCommand() throws SegmentParseException {
 		String line = "D   128.2   -65.9   -86.8  SZ7  P    0.0    3.0    1.0    2.0  I   21.8";
 		DrawSurveyCommand command = parseDrawSurveyCommand(line);
-		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
-		Assert.assertEquals(new BigDecimal("-65.9"), command.getLocation().getEasting());
-		Assert.assertEquals(new BigDecimal("-86.8"), command.getLocation().getVertical());
+		Assert.assertEquals(Length.feet(128.2), command.getLocation().getNorthing());
+		Assert.assertEquals(Length.feet(-65.9), command.getLocation().getEasting());
+		Assert.assertEquals(Length.feet(-86.8), command.getLocation().getVertical());
 		Assert.assertEquals("Z7", command.getStationName());
-		Assert.assertEquals(new BigDecimal("0.0"), command.getLeft());
-		Assert.assertEquals(new BigDecimal("3.0"), command.getRight());
-		Assert.assertEquals(new BigDecimal("1.0"), command.getUp());
-		Assert.assertEquals(new BigDecimal("2.0"), command.getDown());
-		Assert.assertEquals(new BigDecimal("21.8"), command.getDistanceFromEntrance());
+		Assert.assertEquals(Length.feet(0.0), command.getLeft());
+		Assert.assertEquals(Length.feet(3.0), command.getUp());
+		Assert.assertEquals(Length.feet(1.0), command.getDown());
+		Assert.assertEquals(Length.feet(2.0), command.getRight());
+		Assert.assertEquals(Length.feet(21.8), command.getDistanceFromEntrance());
 	}
 
 	@Test
@@ -96,15 +97,15 @@ public class CompassPlotParserTests {
 		CompassPlotParser parser = new CompassPlotParser();
 		String line = "D   128.2   -65.9   -86.8  SZ7  P    a0.0    b3.0    .    %2.0  I   21.8";
 		DrawSurveyCommand command = parser.parseDrawSurveyCommand(parser(line));
-		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
-		Assert.assertEquals(new BigDecimal("-65.9"), command.getLocation().getEasting());
-		Assert.assertEquals(new BigDecimal("-86.8"), command.getLocation().getVertical());
+		Assert.assertEquals(Length.feet(128.2), command.getLocation().getNorthing());
+		Assert.assertEquals(Length.feet(-65.9), command.getLocation().getEasting());
+		Assert.assertEquals(Length.feet(-86.8), command.getLocation().getVertical());
 		Assert.assertEquals("Z7", command.getStationName());
 		Assert.assertNull(command.getLeft());
 		Assert.assertNull(command.getRight());
 		Assert.assertNull(command.getUp());
 		Assert.assertNull(command.getDown());
-		Assert.assertEquals(new BigDecimal("21.8"), command.getDistanceFromEntrance());
+		Assert.assertEquals(Length.feet(21.8), command.getDistanceFromEntrance());
 
 		List<CompassParseError> errors = parser.getErrors();
 		Assert.assertEquals(line.indexOf("a0.0"), errors.get(0).getSegment().startCol);
@@ -117,14 +118,14 @@ public class CompassPlotParserTests {
 	public void testParseFeatureCommand() throws SegmentParseException {
 		String line = "L   128.2   -65.9   -86.8  SZ7  P    0.0    3.0    1.0    2.0  V   21.8";
 		FeatureCommand command = parseFeatureCommand(line);
-		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
-		Assert.assertEquals(new BigDecimal("-65.9"), command.getLocation().getEasting());
-		Assert.assertEquals(new BigDecimal("-86.8"), command.getLocation().getVertical());
+		Assert.assertEquals(Length.feet(128.2), command.getLocation().getNorthing());
+		Assert.assertEquals(Length.feet(-65.9), command.getLocation().getEasting());
+		Assert.assertEquals(Length.feet(-86.8), command.getLocation().getVertical());
 		Assert.assertEquals("Z7", command.getStationName());
-		Assert.assertEquals(new BigDecimal("0.0"), command.getLeft());
-		Assert.assertEquals(new BigDecimal("3.0"), command.getRight());
-		Assert.assertEquals(new BigDecimal("1.0"), command.getUp());
-		Assert.assertEquals(new BigDecimal("2.0"), command.getDown());
+		Assert.assertEquals(Length.feet(0.0), command.getLeft());
+		Assert.assertEquals(Length.feet(3.0), command.getRight());
+		Assert.assertEquals(Length.feet(1.0), command.getUp());
+		Assert.assertEquals(Length.feet(2.0), command.getDown());
 		Assert.assertEquals(new BigDecimal("21.8"), command.getValue());
 	}
 
@@ -133,9 +134,9 @@ public class CompassPlotParserTests {
 		CompassPlotParser parser = new CompassPlotParser();
 		String line = "L   128.2   -65.9   -86.8  SZ7  P    a0.0    b3.0    .    %2.0  V   21.8";
 		FeatureCommand command = parser.parseFeatureCommand(parser(line));
-		Assert.assertEquals(new BigDecimal("128.2"), command.getLocation().getNorthing());
-		Assert.assertEquals(new BigDecimal("-65.9"), command.getLocation().getEasting());
-		Assert.assertEquals(new BigDecimal("-86.8"), command.getLocation().getVertical());
+		Assert.assertEquals(Length.feet(128.2), command.getLocation().getNorthing());
+		Assert.assertEquals(Length.feet(-65.9), command.getLocation().getEasting());
+		Assert.assertEquals(Length.feet(-86.8), command.getLocation().getVertical());
 		Assert.assertEquals("Z7", command.getStationName());
 		Assert.assertNull(command.getLeft());
 		Assert.assertNull(command.getRight());
